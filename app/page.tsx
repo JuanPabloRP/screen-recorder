@@ -1,8 +1,50 @@
-import Image from "next/image";
+import Navbar from '@/components/Navbar';
+import Image from 'next/image';
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+	return (
+		<>
+			<Navbar />
+			<main className="min-h-screen">
+				<header className="flex justify-around items-center flex-wrap gap-11 lg:gap-2">
+					<div className="text-3xl font-bold">
+						<h1 className="text-balance text-congress-blue-50 ">
+							Grabar pantalla
+						</h1>
+						<p className="uppercase text-congress-blue-400 text-5xl">
+							online y gratis
+						</p>
+						<button className="mx-auto mt-2 text-center text-lg bg-congress-blue-500 p-2 rounded-md hover:bg-congress-blue-600 focus:bg-congress-blue-800 focus:text-congress-blue-100">
+							Empezar a grabar
+						</button>
+					</div>
+					<div className="h-96 w-96 bg-congress-blue-700">Image</div>
+				</header>
+				<section className="flex flex-wrap">
+					<article>
+						<h3>¿Es seguro?</h3>
+						<p>Sí, la web es completamnete segura</p>
+					</article>
+					<article>
+						<h3>¿Es totalmente gratis?</h3>
+						<p>Sí, su uso es 100% gratis</p>
+					</article>
+					<article>
+						<h3>¿Cómo aporto?</h3>
+						<p>
+							Puedes aportar a este proyecto aportando en el repositorio de este
+							proyecto
+						</p>
+						<a href="">Link</a>
+					</article>
+				</section>
+			</main>
+		</>
+	);
+}
+
+/*
+ <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
           Get started by editing&nbsp;
@@ -109,5 +151,4 @@ export default function Home() {
         </a>
       </div>
     </main>
-  );
-}
+*/
