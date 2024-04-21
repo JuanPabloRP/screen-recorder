@@ -1,8 +1,56 @@
-import Image from "next/image";
+import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+	return (
+		<>
+			<main className="min-h-screen">
+				<header className="flex justify-around items-center flex-wrap gap-11 lg:gap-2">
+					<div className="text-3xl font-bold">
+						<h1 className="text-balance text-congress-blue-50 ">
+							Grabar pantalla
+						</h1>
+						<p className="uppercase text-congress-blue-400 text-5xl">
+							online y gratis
+						</p>
+						<Link
+							href={'/recorder'}
+							className="mx-auto mt-2 text-center text-lg bg-congress-blue-500 p-2 rounded-md hover:bg-congress-blue-600 focus:bg-congress-blue-800 focus:text-congress-blue-100"
+						>
+							Empezar a grabar
+						</Link>
+					</div>
+					<div className="h-96 w-96 bg-congress-blue-700">Image</div>
+				</header>
+				<section className="flex flex-wrap justify-center  gap-4 mt-2">
+					<article className="max-w-72 bg-congress-blue-950 p-5 rounded-md border border-transparent hover:border-congress-blue-800 transition-all ">
+						<h3 className="text-xl  font-bold">¿Es seguro?</h3>
+						<p className="text-congress-blue-300">
+							Sí, la web es completamnete segura
+						</p>
+					</article>
+					<article className="max-w-72 bg-congress-blue-950 p-5 rounded-md border border-transparent hover:border-congress-blue-800 transition-all ">
+						<h3 className="text-xl  font-bold">¿Es totalmente gratis?</h3>
+						<p className="text-congress-blue-300">Sí, su uso es 100% gratis</p>
+					</article>
+					<article className="max-w-72 bg-congress-blue-950 p-5 rounded-md border border-transparent hover:border-congress-blue-800 transition-all ">
+						<h3 className="text-xl  font-bold">¿Cómo aporto?</h3>
+						<p className="text-congress-blue-300">
+							Puedes aportar a este proyecto aportando en el repositorio de este
+							proyecto
+						</p>
+						<a href=""></a>
+					</article>
+				</section>
+			</main>
+		</>
+	);
+}
+
+/*
+ <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
           Get started by editing&nbsp;
@@ -109,5 +157,4 @@ export default function Home() {
         </a>
       </div>
     </main>
-  );
-}
+*/
