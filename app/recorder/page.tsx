@@ -50,10 +50,10 @@ const Recorder = () => {
 	const handleEndRecording = async () => {
 		try {
 			handleDownload();
-			mediaRef.current.getTracks().forEach((track) => track.stop());
+			mediaRef.current?.getTracks().forEach((track) => track.stop());
 			console.log(mediaRecordingRef.current);
 			if (mediaRecordingRef.current) {
-				mediaRecordingRef.current.stop();
+				mediaRecordingRef.current?.stop();
 			}
 			const updatedRecording = { ...recording, isRecording: false };
 			setRecording(updatedRecording);
@@ -67,7 +67,7 @@ const Recorder = () => {
 	const handlePauseRecording = async () => {
 		console.log(mediaRecordingRef.current);
 		if (mediaRecordingRef.current) {
-			mediaRecordingRef.current.pause();
+			mediaRecordingRef.current?.pause();
 		}
 		const updatedRecording = { ...recording, isPaused: true };
 		setRecording(updatedRecording);
@@ -77,7 +77,7 @@ const Recorder = () => {
 		console.log(mediaRecordingRef.current);
 
 		if (mediaRecordingRef.current) {
-			mediaRecordingRef.current.resume();
+			mediaRecordingRef.current?.resume();
 		}
 		const updatedRecording = { ...recording, isPaused: false };
 		setRecording(updatedRecording);
@@ -85,12 +85,11 @@ const Recorder = () => {
 
 	const handleDownload = async () => {
 		try {
-			mediaRecordingRef.current.ondataavailable = (event) => {
+			mediaRecordingRef.current?.ondataavailable = (event) => {
 				const blob = new Blob([event.data], { type: 'video/webm' });
 				const url = URL.createObjectURL(blob);
 				const a = document.createElement('a');
 				document.body.appendChild(a);
-				a.style = 'display: none';
 				a.href = url;
 				a.download = 'recording.webm';
 				a.click();
