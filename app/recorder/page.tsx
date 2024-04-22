@@ -85,7 +85,7 @@ const Recorder = () => {
 
 	const handleDownload = async () => {
 		try {
-			mediaRecordingRef.current?.ondataavailable = (event) => {
+			mediaRecordingRef.current.ondataavailable = (event) => {
 				const blob = new Blob([event.data], { type: 'video/webm' });
 				const url = URL.createObjectURL(blob);
 				const a = document.createElement('a');
