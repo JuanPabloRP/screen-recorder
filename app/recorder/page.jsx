@@ -5,6 +5,7 @@ import mic from '@/public/svg/mic.svg';
 import video from '@/public/svg/video.svg';
 import screen from '@/public/svg/screen.svg';
 import audio from '@/public/svg/audio.svg';
+import { log } from 'console';
 
 const Recorder = () => {
 	const [recording, setRecording] = useState({
@@ -22,7 +23,7 @@ const Recorder = () => {
 
 	const handleStartRecording = async () => {
 		try {
-			console.log(mediaRecordingRef.current);
+			//console.log(mediaRecordingRef.current);
 
 			const media = await navigator.mediaDevices.getDisplayMedia({
 				video: { frameRate: { ideal: recording.fps } },
@@ -34,7 +35,7 @@ const Recorder = () => {
 			const mediaRecorder = new MediaRecorder(media, {
 				mimeType: 'video/webm; codecs=vp9',
 			});
-
+			console.log(mediaRecorder);
 			mediaRecordingRef.current = mediaRecorder;
 			mediaRecorder.start();
 
@@ -149,22 +150,38 @@ const Recorder = () => {
 				id: '25',
 				title: '25',
 				active: recording.fps == 25,
+				disabled: recording.isRecording,
 			},
 			{
 				id: '30',
 				title: '30 (Por defecto)',
 				active: recording.fps == 30,
+				disabled: recording.isRecording,
 			},
 			{
 				id: '60',
 				title: '60',
 				active: recording.fps == 60,
+				disabled: recording.isRecording,
 			},
 		],
 	};
+
+	useEffect(() => {
+		const fun = async () => {
+			const mediaObj = await navigator.mediaDevices.enumerateDevices();
+			console.log(mediaObj);
+		};
+
+		fun();
+	});
+
 	return (
 		<main className="min-h-screen flex flex-col justify-center items-center gap-10 ">
 			<h1 className="text-4xl font-bold ">¿Que deseas grabar?</h1>
+			<p className="text-red-600 underline text-xl">
+				Estos botones han sido desabilitados durante este versión
+			</p>
 			<ul className="flex gap-5">
 				{btnOptions.recordingOptions.map(
 					({ id, title, active, svg }, index) => (
@@ -178,6 +195,7 @@ const Recorder = () => {
 								id={id}
 								className="w-full h-full flex justify-center items-center "
 								onClick={(e) => handleRecordingOptions(e, 'recordingOptions')}
+								disabled={true}
 							>
 								<Image src={svg} alt="svg" className="text-white " />
 							</button>
@@ -188,7 +206,7 @@ const Recorder = () => {
 
 			<h2 className="text-2xl">FPS deseados</h2>
 			<ul className="flex justify-between  gap-5">
-				{btnOptions.FPSoptions.map(({ id, title, active }, index) => (
+				{btnOptions.FPSoptions.map(({ id, title, active, disabled }, index) => (
 					<li
 						key={index}
 						className={` border border-congress-blue-600 rounded-md  hover:border-congress-blue-900 ${
@@ -199,6 +217,7 @@ const Recorder = () => {
 							id={id}
 							className="w-full h-full p-2"
 							onClick={(e) => handleRecordingOptions(e, 'FPSoptions')}
+							disabled={disabled}
 						>
 							{title}
 						</button>
@@ -214,7 +233,7 @@ const Recorder = () => {
 					Empezar
 				</button>
 			) : (
-				<>
+				<section className="flex gap-5">
 					<button
 						className='className="mx-auto  text-center text-lg bg-red-500 p-2 rounded-md hover:bg-red-600 focus:bg-red-800 focus:text-congress-blue-100'
 						onClick={() => handleEndRecording()}
@@ -238,7 +257,7 @@ const Recorder = () => {
 							</button>
 						)}
 					</section>
-				</>
+				</section>
 			)}
 		</main>
 	);
