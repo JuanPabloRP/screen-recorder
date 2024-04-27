@@ -10,7 +10,7 @@ const Navbar = () => {
 				Screen recorder
 			</Link>
 
-			<ul className="flex  gap-2">
+			<ul className="flex gap-2 mr-5">
 				<li>
 					<Link href={'/recorder'}>Empezar a grabar</Link>
 				</li>
