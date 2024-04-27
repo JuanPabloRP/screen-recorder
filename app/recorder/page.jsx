@@ -5,7 +5,7 @@ import mic from '@/public/svg/mic.svg';
 import video from '@/public/svg/video.svg';
 import screen from '@/public/svg/screen.svg';
 import audio from '@/public/svg/audio.svg';
-import { log } from 'console';
+
 
 const Recorder = () => {
 	const [recording, setRecording] = useState({
