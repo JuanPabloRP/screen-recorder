@@ -5,45 +5,48 @@ import mic from '@/public/svg/mic.svg';
 import video from '@/public/svg/video.svg';
 import screen from '@/public/svg/screen.svg';
 import audio from '@/public/svg/audio.svg';
-
+import RecordingOptions from '@/components/recorder/RecordingOptions';
+import VideoPlayer from '@/components/recorder/VideoPlayer';
+import { useRecordingContext } from '@/context/recordingContext';
 
 const Recorder = () => {
-	const [recording, setRecording] = useState({
-		video: false,
-		audio: true,
-		screen: true,
-		mic: false,
-		fps: 30,
-		isRecording: false,
-		isPaused: false,
-	});
+	const { recording, setRecording } = useRecordingContext();
 
-	const mediaRecordingRef = useRef({});
+	const mediaRecorderRef = useRef({});
 	const mediaRef = useRef({});
+	const videoStreamRef = useRef({});
 
 	const handleStartRecording = async () => {
 		try {
-			//console.log(mediaRecordingRef.current);
-
 			const media = await navigator.mediaDevices.getDisplayMedia({
 				video: { frameRate: { ideal: recording.fps } },
 				audio: recording.audio,
 			});
-
+			//Save the media stream
 			mediaRef.current = media;
 
 			const mediaRecorder = new MediaRecorder(media, {
 				mimeType: 'video/webm; codecs=vp9',
 			});
-			console.log(mediaRecorder);
-			mediaRecordingRef.current = mediaRecorder;
+			//Save the media recorder
+			mediaRecorderRef.current = mediaRecorder;
+			//Start recording
 			mediaRecorder.start();
 
-			console.log(media);
-			const updatedRecording = { ...recording, isRecording: true };
+			//Set the video stream to the video element00
+			videoStreamRef.current.srcObject = media;
+			console.log(videoStreamRef.current.srcObject);
+
+			//Update the state
+			const updatedRecording = {
+				...recording,
+				isRecording: true,
+				videoStream: media,
+			};
 			setRecording(updatedRecording);
+			console.log(recording.videoStream);
 		} catch (error) {
-			//console.error(error);
+			console.error(error);
 			setRecording({ ...recording, isRecording: false });
 		}
 	};
@@ -51,34 +54,36 @@ const Recorder = () => {
 	const handleEndRecording = async () => {
 		try {
 			handleDownload();
+
 			mediaRef.current?.getTracks().forEach((track) => track.stop());
-			console.log(mediaRecordingRef.current);
-			if (mediaRecordingRef.current) {
-				mediaRecordingRef.current?.stop();
+			//console.log(mediaRecorderRef.current);
+
+			if (mediaRecorderRef.current) {
+				mediaRecorderRef.current?.stop();
 			}
 			const updatedRecording = { ...recording, isRecording: false };
 			setRecording(updatedRecording);
 
 			//const [video] = await mediaRef.current.getVideoTracks();
 		} catch (error) {
-			console.log(error);
+			//console.log(error);
 		}
 	};
 
 	const handlePauseRecording = async () => {
-		console.log(mediaRecordingRef.current);
-		if (mediaRecordingRef.current) {
-			mediaRecordingRef.current?.pause();
+		//console.log(mediaRecorderRef.current);
+		if (mediaRecorderRef.current) {
+			mediaRecorderRef.current?.pause();
 		}
 		const updatedRecording = { ...recording, isPaused: true };
 		setRecording(updatedRecording);
 	};
 
 	const handleContinueRecording = async () => {
-		console.log(mediaRecordingRef.current);
+		//console.log(mediaRecorderRef.current);
 
-		if (mediaRecordingRef.current) {
-			mediaRecordingRef.current?.resume();
+		if (mediaRecorderRef.current) {
+			mediaRecorderRef.current?.resume();
 		}
 		const updatedRecording = { ...recording, isPaused: false };
 		setRecording(updatedRecording);
@@ -86,7 +91,7 @@ const Recorder = () => {
 
 	const handleDownload = async () => {
 		try {
-			mediaRecordingRef.current.ondataavailable = (event) => {
+			mediaRecorderRef.current.ondataavailable = (event) => {
 				const blob = new Blob([event.data], { type: 'video/webm' });
 				const url = URL.createObjectURL(blob);
 				const a = document.createElement('a');
@@ -103,7 +108,7 @@ const Recorder = () => {
 
 	const handleRecordingOptions = (e, type) => {
 		if (type == 'FPSoptions') {
-			console.log(e.target.id);
+			//console.log(e.target.id);
 			const { id } = e.target;
 
 			const updatedRecording = { ...recording, fps: id };
@@ -123,7 +128,7 @@ const Recorder = () => {
 			{
 				id: 'screen',
 				title: 'Grabar pantalla',
-				active: recording.screen,
+				active: true,
 				svg: screen,
 			},
 			{
@@ -135,13 +140,13 @@ const Recorder = () => {
 			{
 				id: 'video',
 				title: 'Grabar cámara',
-				active: recording.video,
+				active: false,
 				svg: video,
 			},
 			{
 				id: 'mic',
 				title: 'Grabar micrófono',
-				active: recording.mic,
+				active: false,
 				svg: mic,
 			},
 		],
@@ -166,101 +171,35 @@ const Recorder = () => {
 			},
 		],
 	};
-
-	useEffect(() => {
-		const fun = async () => {
-			const mediaObj = await navigator.mediaDevices.enumerateDevices();
-			console.log(mediaObj);
-		};
-
-		fun();
-	});
-
 	return (
-		<main className="min-h-screen flex flex-col justify-center items-center gap-10 ">
-			<h1 className="text-4xl font-bold ">¿Que deseas grabar?</h1>
-			<p className="text-red-600 underline text-xl">
-				Estos botones han sido desabilitados durante este versión
-			</p>
-			<ul className="flex gap-5">
-				{btnOptions.recordingOptions.map(
-					({ id, title, active, svg }, index) => (
-						<li
-							key={index}
-							className={`w-36 h-36 border border-congress-blue-600 rounded-md ${
-								active ? 'bg-congress-blue-600' : ''
-							}`}
-						>
-							<button
-								id={id}
-								className="w-full h-full flex justify-center items-center "
-								onClick={(e) => handleRecordingOptions(e, 'recordingOptions')}
-								disabled={true}
-							>
-								<Image src={svg} alt="svg" className="text-white " />
-							</button>
-						</li>
-					)
-				)}
-			</ul>
-
-			<h2 className="text-2xl">FPS deseados</h2>
-			<ul className="flex justify-between  gap-5">
-				{btnOptions.FPSoptions.map(({ id, title, active, disabled }, index) => (
-					<li
-						key={index}
-						className={` border border-congress-blue-600 rounded-md  hover:border-congress-blue-900 ${
-							active ? 'bg-congress-blue-600' : ''
-						}`}
-					>
-						<button
-							id={id}
-							className="w-full h-full p-2"
-							onClick={(e) => handleRecordingOptions(e, 'FPSoptions')}
-							disabled={disabled}
-						>
-							{title}
-						</button>
-					</li>
-				))}
-			</ul>
-
+		<main className="min-h-screen flex flex-col  items-center gap-10 ">
 			{!recording.isRecording ? (
-				<button
-					onClick={() => handleStartRecording()}
-					className="mx-auto  text-center text-lg bg-congress-blue-500 p-2 rounded-md hover:bg-congress-blue-600 focus:bg-congress-blue-800 focus:text-congress-blue-100"
-				>
-					Empezar
-				</button>
+				<RecordingOptions
+					handleStartRecording={handleStartRecording}
+					btnOptions={btnOptions}
+					handleRecordingOptions={handleRecordingOptions}
+				/>
 			) : (
-				<section className="flex gap-5">
-					<button
-						className='className="mx-auto  text-center text-lg bg-red-500 p-2 rounded-md hover:bg-red-600 focus:bg-red-800 focus:text-congress-blue-100'
-						onClick={() => handleEndRecording()}
-					>
-						Dejar de grabar
-					</button>
-					<section>
-						{recording.isPaused ? (
-							<button
-								onClick={() => handleContinueRecording()}
-								className="bg-green-600 p-2 rounded-md"
-							>
-								Continuar
-							</button>
-						) : (
-							<button
-								onClick={() => handlePauseRecording()}
-								className="bg-congress-blue-600 p-2 rounded-md"
-							>
-								Pausar
-							</button>
-						)}
-					</section>
-				</section>
+				<VideoPlayer
+					videoStreamRef={videoStreamRef.current.srcObject}
+					handleEndRecording={handleEndRecording}
+					handleContinueRecording={handleContinueRecording}
+					handlePauseRecording={handlePauseRecording}
+				/>
 			)}
 		</main>
 	);
 };
 
 export default Recorder;
+
+/* const [recording, setRecording] = useState({
+		video: false,
+		audio: true,
+		screen: true,
+		mic: false,
+		fps: 30,
+		isRecording: false,
+		isPaused: false,
+		videoStream: {},
+	}); */
