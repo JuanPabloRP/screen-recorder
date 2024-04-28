@@ -19,6 +19,8 @@ export function RecordingWrapper({ children }: { children: React.ReactNode }) {
 		isRecording: false,
 		isPaused: false,
 		videoStream: {},
+		mediaRecorder: {},
+		media: {},
 	});
 
 	return (

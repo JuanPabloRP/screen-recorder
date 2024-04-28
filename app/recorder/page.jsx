@@ -8,6 +8,7 @@ import audio from '@/public/svg/audio.svg';
 import RecordingOptions from '@/components/recorder/RecordingOptions';
 import VideoPlayer from '@/components/recorder/VideoPlayer';
 import { useRecordingContext } from '@/context/recordingContext';
+import ConfirmationPrompt from '@/components/ConfirmationPrompt';
 
 const Recorder = () => {
 	const { recording, setRecording } = useRecordingContext();
@@ -16,35 +17,57 @@ const Recorder = () => {
 	const mediaRef = useRef({});
 	const videoStreamRef = useRef({});
 
+	useEffect(() => {
+		const initialize = async () => {
+			try {
+				if (
+					Object.keys(mediaRecorderRef.current).length === 0 ||
+					Object.keys(mediaRef.current).length === 0
+				) {
+					mediaRef.current = recording.media;
+					mediaRecorderRef.current = recording.mediaRecorder;
+				}
+			} catch (error) {
+				console.log(error);
+			}
+		};
+
+		initialize();
+	}, []);
+
+	console.log();
+
 	const handleStartRecording = async () => {
 		try {
 			const media = await navigator.mediaDevices.getDisplayMedia({
 				video: { frameRate: { ideal: recording.fps } },
 				audio: recording.audio,
 			});
+
 			//Save the media stream
 			mediaRef.current = media;
+			//Set the video stream to the video element
+			videoStreamRef.current.srcObject = media;
 
 			const mediaRecorder = new MediaRecorder(media, {
 				mimeType: 'video/webm; codecs=vp9',
 			});
-			//Save the media recorder
-			mediaRecorderRef.current = mediaRecorder;
+
 			//Start recording
 			mediaRecorder.start();
 
-			//Set the video stream to the video element00
-			videoStreamRef.current.srcObject = media;
-			console.log(videoStreamRef.current.srcObject);
+			//Save the media recorder
+			mediaRecorderRef.current = mediaRecorder;
 
 			//Update the state
 			const updatedRecording = {
 				...recording,
 				isRecording: true,
-				videoStream: media,
+				videoStream: mediaRef.current,
+				mediaRecorder: mediaRecorderRef.current,
+				media: mediaRef.current,
 			};
 			setRecording(updatedRecording);
-			console.log(recording.videoStream);
 		} catch (error) {
 			console.error(error);
 			setRecording({ ...recording, isRecording: false });
@@ -171,6 +194,9 @@ const Recorder = () => {
 			},
 		],
 	};
+
+	useEffect(() => {}, []);
+
 	return (
 		<main className="min-h-screen flex flex-col  items-center gap-10 ">
 			{!recording.isRecording ? (
@@ -187,6 +213,7 @@ const Recorder = () => {
 					handlePauseRecording={handlePauseRecording}
 				/>
 			)}
+			<ConfirmationPrompt />
 		</main>
 	);
 };
@@ -203,3 +230,41 @@ export default Recorder;
 		isPaused: false,
 		videoStream: {},
 	}); */
+
+/*
+	const handleStartRecording = async () => {
+		try {
+			const media = await navigator.mediaDevices.getDisplayMedia({
+				video: { frameRate: { ideal: recording.fps } },
+				audio: recording.audio,
+			});
+
+			const mediaRecorder = new MediaRecorder(media, {
+				mimeType: 'video/webm; codecs=vp9',
+			});
+			//Save the media recorder
+			mediaRecorderRef.current = mediaRecorder;
+			//Start recording
+			mediaRecorder.start();
+
+			//Save the media stream
+			mediaRef.current = media;
+			//Set the video stream to the video element
+			videoStreamRef.current.srcObject = media;
+
+			console.log(videoStreamRef.current.srcObject);
+
+			//Update the state
+			const updatedRecording = {
+				...recording,
+				isRecording: true,
+				videoStream: mediaRef.current,
+			};
+			setRecording(updatedRecording);
+			console.log(recording.videoStream);
+		} catch (error) {
+			console.error(error);
+			setRecording({ ...recording, isRecording: false });
+		}
+	};
+	*/
