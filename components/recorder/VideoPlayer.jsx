@@ -22,7 +22,9 @@ const VideoPlayer = ({
 	useEffect(() => {
 		if (videoRef.current && videoStreamRef) {
 			videoRef.current.srcObject = videoStreamRef;
+			return;
 		}
+		videoRef.current.srcObject = recording.videoStream;
 	}, [videoStreamRef]);
 
 	return (
