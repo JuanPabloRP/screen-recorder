@@ -11,14 +11,23 @@ const RecordingContext = createContext<any>(undefined);
 
 export function RecordingWrapper({ children }: { children: React.ReactNode }) {
 	const [recording, setRecording] = useState({
-		video: false,
-		audio: true,
-		screen: true,
-		mic: false,
+		screen: {
+			active: true,
+			stream: {},
+		},
+		audio: {
+			active: true,
+		},
+		camera: {
+			active: true,
+			stream: {},
+		},
+		mic: {
+			active: true,
+		},
 		fps: 30,
 		isRecording: false,
 		isPaused: false,
-		videoStream: {},
 		mediaRecorder: {},
 		media: {},
 	});

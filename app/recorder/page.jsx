@@ -1,31 +1,37 @@
 'use client';
-import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
-import mic from '@/public/svg/mic.svg';
-import video from '@/public/svg/video.svg';
-import screen from '@/public/svg/screen.svg';
-import audio from '@/public/svg/audio.svg';
+import { useRecordingContext } from '@/context/recordingContext';
 import RecordingOptions from '@/components/recorder/RecordingOptions';
 import VideoPlayer from '@/components/recorder/VideoPlayer';
-import { useRecordingContext } from '@/context/recordingContext';
 import ConfirmationPrompt from '@/components/ConfirmationPrompt';
+import screen from '@/public/svg/screen.svg';
+import audio from '@/public/svg/audio.svg';
+import video from '@/public/svg/video.svg';
+import mic from '@/public/svg/mic.svg';
 
 const Recorder = () => {
 	const { recording, setRecording } = useRecordingContext();
 
 	const mediaRecorderRef = useRef({});
 	const mediaRef = useRef({});
-	const videoStreamRef = useRef({});
+	const screenStreamRef = useRef({});
+	const cameraStreamRef = useRef({});
 
 	useEffect(() => {
 		const initialize = async () => {
 			try {
 				if (
 					Object.keys(mediaRecorderRef.current).length === 0 ||
-					Object.keys(mediaRef.current).length === 0
+					Object.keys(mediaRef.current).length === 0 /* ||
+					Object.keys(screenStreamRef.current).length === 0 ||
+					Object.keys(cameraStreamRef.current).length === 0 */
 				) {
 					mediaRef.current = recording.media;
 					mediaRecorderRef.current = recording.mediaRecorder;
+					/* screenStreamRef.current.srcObject = recording.screenStream;
+					cameraStreamRef.current.srcObject = recording.cameraStream; */
+
+					console.log(recording);
 				}
 			} catch (error) {
 				console.log(error);
@@ -35,21 +41,41 @@ const Recorder = () => {
 		initialize();
 	}, []);
 
-	console.log();
-
 	const handleStartRecording = async () => {
 		try {
-			const media = await navigator.mediaDevices.getDisplayMedia({
+			const screenMedia = await navigator.mediaDevices.getDisplayMedia({
 				video: { frameRate: { ideal: recording.fps } },
-				audio: recording.audio,
+				audio: recording.audio.active,
 			});
 
-			//Save the media stream
-			mediaRef.current = media;
-			//Set the video stream to the video element
-			videoStreamRef.current.srcObject = media;
+			// Check if the camera and mic exist
+			const cameraExist = handleCheckDevice('videoinput');
+			const micExist = handleCheckDevice('audioinput');
 
-			const mediaRecorder = new MediaRecorder(media, {
+			//If the camera or mic exist, add the media stream to the screen media
+			if (recording.camera.active || recording.mic.active) {
+				const cameraMedia = await navigator.mediaDevices.getUserMedia({
+					video: cameraExist && recording.camera.active,
+					audio: micExist && recording.mic.active,
+				});
+
+				/* cameraMedia.getTracks().forEach((track) => {
+					screenMedia.addTrack(track);
+				});
+ */
+				//console.log(cameraMedia);
+				cameraStreamRef.current.srcObject = cameraMedia;
+				//console.log(cameraStreamRef.current.srcObject);
+			}
+
+			//Set the video stream to the video element
+			screenStreamRef.current.srcObject = screenMedia;
+
+			//Save the media stream
+			mediaRef.current = screenMedia;
+
+			// Create a media recorder
+			const mediaRecorder = new MediaRecorder(screenMedia, {
 				mimeType: 'video/webm; codecs=vp9',
 			});
 
@@ -63,7 +89,8 @@ const Recorder = () => {
 			const updatedRecording = {
 				...recording,
 				isRecording: true,
-				videoStream: mediaRef.current,
+				/* screenStream: screenStreamRef.current.srcObject,
+				cameraStrem: cameraStreamRef.current.srcObject, */
 				mediaRecorder: mediaRecorderRef.current,
 				media: mediaRef.current,
 			};
@@ -129,6 +156,17 @@ const Recorder = () => {
 		}
 	};
 
+	const handleCheckDevice = async (type) => {
+		try {
+			const devices = await navigator.mediaDevices.enumerateDevices();
+			const device = devices.find((device) => device.kind === type);
+			return device ? true : false;
+			//console.log(device);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	const handleRecordingOptions = (e, type) => {
 		if (type == 'FPSoptions') {
 			//console.log(e.target.id);
@@ -141,7 +179,10 @@ const Recorder = () => {
 		if (type == 'recordingOptions') {
 			const { id } = e.target;
 
-			const updatedRecording = { ...recording, [id]: !recording[id] };
+			const updatedRecording = {
+				...recording,
+				[id]: { ...recording[id], active: !recording[id].active },
+			};
 			setRecording(updatedRecording);
 		}
 	};
@@ -153,24 +194,28 @@ const Recorder = () => {
 				title: 'Grabar pantalla',
 				active: true,
 				svg: screen,
+				text: 'Pantalla',
 			},
 			{
 				id: 'audio',
 				title: 'Grabar audio',
-				active: recording.audio,
+				active: recording.audio.active,
 				svg: audio,
+				text: 'Audio',
 			},
 			{
-				id: 'video',
+				id: 'camera',
 				title: 'Grabar cámara',
-				active: false,
+				active: recording.camera.active,
 				svg: video,
+				text: 'Cámara',
 			},
 			{
 				id: 'mic',
 				title: 'Grabar micrófono',
-				active: false,
+				active: recording.mic.active,
 				svg: mic,
+				text: 'Micrófono',
 			},
 		],
 		FPSoptions: [
@@ -195,8 +240,6 @@ const Recorder = () => {
 		],
 	};
 
-	useEffect(() => {}, []);
-
 	return (
 		<main className="min-h-screen flex flex-col  items-center gap-10 ">
 			{!recording.isRecording ? (
@@ -207,13 +250,19 @@ const Recorder = () => {
 				/>
 			) : (
 				<VideoPlayer
-					videoStreamRef={videoStreamRef.current.srcObject}
+					screenStreamRef={screenStreamRef.current.srcObject}
+					cameraStreamRef={cameraStreamRef.current.srcObject}
 					handleEndRecording={handleEndRecording}
 					handleContinueRecording={handleContinueRecording}
 					handlePauseRecording={handlePauseRecording}
+					handleDownload={handleDownload}
 				/>
 			)}
 			<ConfirmationPrompt />
+
+			{/* <video ref={screenStreamRef} autoPlay></video> */}
+
+			{/* <video ref={cameraStreamRef} autoPlay className="max-w-56"></video> */}
 		</main>
 	);
 };
@@ -250,9 +299,9 @@ export default Recorder;
 			//Save the media stream
 			mediaRef.current = media;
 			//Set the video stream to the video element
-			videoStreamRef.current.srcObject = media;
+			screenStreamRef.current.srcObject = media;
 
-			console.log(videoStreamRef.current.srcObject);
+			console.log(screenStreamRef.current.srcObject);
 
 			//Update the state
 			const updatedRecording = {
