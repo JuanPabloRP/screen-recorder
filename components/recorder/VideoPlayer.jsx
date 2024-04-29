@@ -25,6 +25,14 @@ const VideoPlayer = ({
 	const cameraRef = useRef({});
 
 	useEffect(() => {
+		setRecording((prev) => ({
+			...prev,
+			screenStream: screenStreamRef,
+			cameraStream: cameraStreamRef,
+		}));
+	}, []);
+
+	useEffect(() => {
 		if (screenRef.current && screenStreamRef) {
 			screenRef.current.srcObject = screenStreamRef;
 			return;
@@ -48,12 +56,21 @@ const VideoPlayer = ({
 
 	return (
 		<main className="h-screen w-full flex flex-col items-center  ">
-			<h1 className="text-4xl font-bold ">
-				{recording.isPaused ? 'Está en pausa... ✖️' : 'Está grabando... 🎥'}
-			</h1>
+			<header>
+				{/* <span className="text-sm font-bold text-left text-gray-500">
+					Estado
+				</span> */}
+				<h1
+					className={`text-4xl font-bold ${
+						recording.isPaused ? 'text-red-500' : 'text-green-500'
+					} `}
+				>
+					{recording.isPaused ? ' En pausa... 🛑' : '  Grabando... 🎥'}
+				</h1>
+			</header>
 
 			{/* Video Stream with pause and stop options */}
-			<section className="">
+			<section className=" ">
 				{recording.screen ? (
 					<video
 						ref={screenRef}
@@ -67,7 +84,7 @@ const VideoPlayer = ({
 					<video
 						ref={cameraRef}
 						autoPlay
-						className="max-w-32 bg-neutral-900 opacity-50"
+						className="max-w-48 bg-neutral-900 opacity-50 absolute right-0 bottom-0 m-5 rounded-md"
 					></video>
 				) : null}
 
@@ -134,7 +151,7 @@ const VideoPlayer = ({
 									stroke-width="2"
 									stroke-linecap="round"
 									stroke-linejoin="round"
-									class="icon icon-tabler icons-tabler-outline icon-tabler-volume-3"
+									className="icon icon-tabler icons-tabler-outline icon-tabler-volume-3"
 								>
 									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
 									<path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
@@ -153,7 +170,7 @@ const VideoPlayer = ({
 									stroke-width="2"
 									stroke-linecap="round"
 									stroke-linejoin="round"
-									class="icon icon-tabler icons-tabler-outline icon-tabler-volume"
+									className="icon icon-tabler icons-tabler-outline icon-tabler-volume"
 								>
 									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
 									<path d="M15 8a5 5 0 0 1 0 8" />
@@ -179,7 +196,7 @@ const VideoPlayer = ({
 							stroke-width="2"
 							stroke-linecap="round"
 							stroke-linejoin="round"
-							class="icon icon-tabler icons-tabler-outline icon-tabler-player-stop"
+							className="icon icon-tabler icons-tabler-outline icon-tabler-player-stop"
 						>
 							<path stroke="none" d="M0 0h24v24H0z" fill="none" />
 							<path d="M5 5m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" />

@@ -22,14 +22,19 @@ const Recorder = () => {
 			try {
 				if (
 					Object.keys(mediaRecorderRef.current).length === 0 ||
-					Object.keys(mediaRef.current).length === 0 /* ||
-					Object.keys(screenStreamRef.current).length === 0 ||
-					Object.keys(cameraStreamRef.current).length === 0 */
+					Object.keys(mediaRef.current).length === 0
 				) {
 					mediaRef.current = recording.media;
 					mediaRecorderRef.current = recording.mediaRecorder;
-					/* screenStreamRef.current.srcObject = recording.screenStream;
-					cameraStreamRef.current.srcObject = recording.cameraStream; */
+					screenStreamRef.current.srcObject = recording.screenAndAudioStream;
+					cameraStreamRef.current.srcObject = recording.cameraAndMicStream;
+
+					console.log({
+						mediaRef,
+						mediaRecorderRef,
+						screenStreamRef,
+						cameraStreamRef,
+					});
 
 					console.log(recording);
 				}
@@ -39,7 +44,7 @@ const Recorder = () => {
 		};
 
 		initialize();
-	}, []);
+	}, [recording]);
 
 	const handleStartRecording = async () => {
 		try {
@@ -62,14 +67,20 @@ const Recorder = () => {
 				/* cameraMedia.getTracks().forEach((track) => {
 					screenMedia.addTrack(track);
 				});
- */
-				//console.log(cameraMedia);
+				*/
+
 				cameraStreamRef.current.srcObject = cameraMedia;
-				//console.log(cameraStreamRef.current.srcObject);
 			}
 
 			//Set the video stream to the video element
 			screenStreamRef.current.srcObject = screenMedia;
+
+			//Reload the video element <- INVESTIGATE WHY THIS IS NECESSARY ksjkjs
+			cameraStreamRef.current.srcObject = cameraStreamRef.current.srcObject;
+
+			cameraStreamRef.current.srcObject.getTracks().forEach((track) => {
+				screenMedia.addTrack(track);
+			});
 
 			//Save the media stream
 			mediaRef.current = screenMedia;
@@ -89,10 +100,11 @@ const Recorder = () => {
 			const updatedRecording = {
 				...recording,
 				isRecording: true,
-				/* screenStream: screenStreamRef.current.srcObject,
-				cameraStrem: cameraStreamRef.current.srcObject, */
+				isPaused: false,
 				mediaRecorder: mediaRecorderRef.current,
 				media: mediaRef.current,
+				screenAndAudioStream: screenStreamRef.current.srcObject,
+				cameraAndMicStream: cameraStreamRef.current.srcObject,
 			};
 			setRecording(updatedRecording);
 		} catch (error) {

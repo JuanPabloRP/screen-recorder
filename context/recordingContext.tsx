@@ -13,18 +13,18 @@ export function RecordingWrapper({ children }: { children: React.ReactNode }) {
 	const [recording, setRecording] = useState({
 		screen: {
 			active: true,
-			stream: {},
 		},
 		audio: {
 			active: true,
 		},
+		screenAndAudioStream: {},
 		camera: {
 			active: true,
-			stream: {},
 		},
 		mic: {
 			active: true,
 		},
+		cameraAndMicStream: {},
 		fps: 30,
 		isRecording: false,
 		isPaused: false,
