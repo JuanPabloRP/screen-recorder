@@ -29,14 +29,14 @@ const Recorder = () => {
 					screenStreamRef.current.srcObject = recording.screenAndAudioStream;
 					cameraStreamRef.current.srcObject = recording.cameraAndMicStream;
 
-					console.log({
+					/* console.log({
 						mediaRef,
 						mediaRecorderRef,
 						screenStreamRef,
 						cameraStreamRef,
-					});
+					}); */
 
-					console.log(recording);
+					//console.log(recording);
 				}
 			} catch (error) {
 				console.log(error);
@@ -77,10 +77,11 @@ const Recorder = () => {
 
 			//Reload the video element <- INVESTIGATE WHY THIS IS NECESSARY ksjkjs
 			cameraStreamRef.current.srcObject = cameraStreamRef.current.srcObject;
-
-			cameraStreamRef.current.srcObject.getTracks().forEach((track) => {
-				screenMedia.addTrack(track);
-			});
+			if (recording.camera.active || recording.mic.active) {
+				cameraStreamRef.current.srcObject.getTracks().forEach((track) => {
+					screenMedia.addTrack(track);
+				});
+			}
 
 			//Save the media stream
 			mediaRef.current = screenMedia;

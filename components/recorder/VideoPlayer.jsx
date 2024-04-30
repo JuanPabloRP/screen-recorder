@@ -19,7 +19,10 @@ const VideoPlayer = ({
 	handlePauseRecording,
 	handleDownload,
 }) => {
-	const [isMuted, setIsMuted] = useState(true);
+	const [isMuted, setIsMuted] = useState({
+		audio: false,
+		mic: false,
+	});
 	const { recording, setRecording } = useRecordingContext();
 	const screenRef = useRef({});
 	const cameraRef = useRef({});
@@ -46,12 +49,20 @@ const VideoPlayer = ({
 
 			return;
 		}
-		cameraRef.current.srcObject = cameraStreamRef;
+		cameraRef.current.srcObject = recording.cameraStream;
 	}, [cameraStreamRef]);
 
-	const handleIsMuted = () => {
-		setIsMuted(!isMuted);
-		screenRef.current.muted = !isMuted;
+	const handleIsMuted = ({ type }) => {
+		if (type === 'audio') {
+			screenRef.current.muted = !isMuted;
+			// silenciar tambien el audio del video
+		}
+
+		if (type === 'mic') {
+			cameraRef.current.muted = !isMuted;
+		}
+
+		setIsMuted({ ...isMuted, [type]: !isMuted[type] });
 	};
 
 	return (
@@ -75,8 +86,8 @@ const VideoPlayer = ({
 					<video
 						ref={screenRef}
 						autoPlay
+						muted={isMuted['audio']}
 						className="max-w-3xl bg-neutral-900 opacity-50"
-						muted={isMuted}
 					></video>
 				) : null}
 
@@ -84,7 +95,8 @@ const VideoPlayer = ({
 					<video
 						ref={cameraRef}
 						autoPlay
-						className="max-w-48 bg-neutral-900 opacity-50 absolute right-0 bottom-0 m-5 rounded-md"
+						muted={isMuted['mic']}
+						className="max-w-48 bg-neutral-900 absolute right-0 bottom-0 m-5 rounded-md"
 					></video>
 				) : null}
 
@@ -138,8 +150,8 @@ const VideoPlayer = ({
 					</section>
 
 					{/* Muted btn */}
-					<button onClick={() => handleIsMuted()}>
-						{isMuted ? (
+					<button onClick={() => handleIsMuted({ type: 'audio' })}>
+						{isMuted['audio'] ? (
 							<>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -176,6 +188,54 @@ const VideoPlayer = ({
 									<path d="M15 8a5 5 0 0 1 0 8" />
 									<path d="M17.7 5a9 9 0 0 1 0 14" />
 									<path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
+								</svg>
+							</>
+						)}
+					</button>
+
+					{/* Muted Mic btn */}
+					<button onClick={() => handleIsMuted({ type: 'mic' })}>
+						{isMuted['mic'] ? (
+							<>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									className="icon icon-tabler icons-tabler-outline icon-tabler-microphone-off"
+								>
+									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+									<path d="M3 3l18 18" />
+									<path d="M9 5a3 3 0 0 1 6 0v5a3 3 0 0 1 -.13 .874m-2 2a3 3 0 0 1 -3.87 -2.872v-1" />
+									<path d="M5 10a7 7 0 0 0 10.846 5.85m2 -2a6.967 6.967 0 0 0 1.152 -3.85" />
+									<path d="M8 21l8 0" />
+									<path d="M12 17l0 4" />
+								</svg>
+							</>
+						) : (
+							<>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									className="icon icon-tabler icons-tabler-outline icon-tabler-microphone"
+								>
+									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+									<path d="M9 2m0 3a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z" />
+									<path d="M5 10a7 7 0 0 0 14 0" />
+									<path d="M8 21l8 0" />
+									<path d="M12 17l0 4" />
 								</svg>
 							</>
 						)}
