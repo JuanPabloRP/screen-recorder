@@ -7,8 +7,9 @@ interface BtnOption {
 	id: string;
 	title: string;
 	active: boolean;
-	disabled?: boolean ;
+	disabled?: boolean;
 	svg: string | StaticImport;
+	text: string;
 }
 
 interface RecordingOptionsProps {
@@ -16,7 +17,7 @@ interface RecordingOptionsProps {
 		recordingOptions: BtnOption[];
 		FPSoptions: BtnOption[];
 	};
-	handleRecordingOptions: (e: any, type: string) => void; // Reemplaza 'any' con el tipo correcto para 'e'
+	handleRecordingOptions: (e: any, type: string) => void;
 	handleStartRecording: () => void;
 }
 
@@ -31,22 +32,29 @@ const RecordingOptions = ({
 		<main className="min-h-screen flex flex-col  items-center gap-10 ">
 			<h1 className="text-4xl font-bold ">¿Que deseas grabar?</h1>
 
-			<ul className="flex gap-5">
+			<ul className="flex flex-wrap gap-5">
 				{btnOptions.recordingOptions.map(
-					({ id, title, active, svg }, index) => (
+					({ id, title, active, svg, text }, index) => (
 						<li
 							key={index}
-							className={`w-36 h-36 border border-congress-blue-600 rounded-md ${
+							className={`flex flex-col gap-3 justify-center items-center w-36 h-36 rounded-md border border-congress-blue-600  ${
 								active ? 'bg-congress-blue-600' : ''
-							}`}
+							}  relative`}
 						>
-							<button
-								id={id}
-								className="w-full h-full flex justify-center items-center "
-								onClick={(e) => handleRecordingOptions(e, 'recordingOptions')}
+							<article
+								className="absolute flex flex-col gap-2
+								w-full h-full justify-center items-center
+							"
 							>
 								<Image src={svg} alt="svg" className="text-white " />
-							</button>
+								<p className="text-center">{text}</p>
+							</article>
+
+							<button
+								id={id}
+								className="w-full h-full flex justify-center items-center z-100 absolute "
+								onClick={(e) => handleRecordingOptions(e, 'recordingOptions')}
+							></button>
 						</li>
 					)
 				)}

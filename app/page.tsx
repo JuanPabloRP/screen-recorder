@@ -24,7 +24,7 @@ export default function Home() {
 						</Link>
 					</div>
 					<div className="flex justify-center items-center h-96 w-96">
-						<Image src={Rec} alt="image" />
+						<Image src={Rec} alt="image" priority />
 					</div>
 				</header>
 				<section className="flex flex-wrap justify-center  gap-4 mt-2">
@@ -49,8 +49,16 @@ export default function Home() {
 							>
 								repositorio
 							</a>{' '}
-							de este proyecto
+							de este proyecto.
 						</p>
+						<p className="text-congress-blue-300">También puedes </p>
+						<a
+							href="https://buymeacoffee.com/juanpablorp"
+							target="_blank"
+							className="text-yellow-400 bold underline"
+						>
+							comprarme un café ☕
+						</a>
 					</article>
 				</section>
 			</main>
