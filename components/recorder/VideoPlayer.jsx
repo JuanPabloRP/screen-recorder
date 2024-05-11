@@ -19,8 +19,6 @@ const VideoPlayer = ({
 	handlePauseRecording,
 	handleDownload,
 }) => {
-	const [cameraPiP, setCameraPiP] = useState(true);
-
 	const { recording, setRecording } = useRecordingContext();
 	const screenRef = useRef({});
 	const cameraRef = useRef({});
@@ -51,6 +49,77 @@ const VideoPlayer = ({
 		}
 		cameraRef.current.srcObject = recording.cameraStream;
 	}, [cameraStreamRef]);
+
+	useEffect(() => {
+		const handleCameraPiPMode = () => {
+			try {
+				if (cameraRef.current) {
+					cameraRef.current.requestPictureInPicture();
+				}
+			} catch (error) {
+				console.log('Error al entrar al modo de PiP ', error);
+			}
+		};
+
+		if (cameraRef.current) {
+			cameraRef.current.addEventListener('loadedmetadata', handleCameraPiPMode);
+		}
+
+		return () => {
+			if (cameraRef.current) {
+				cameraRef.current.removeEventListener(
+					'loadedmetadata',
+					handleCameraPiPMode
+				);
+			}
+		};
+	}, []);
+
+	/* useEffect(() => {
+		const handleCameraPiPChange = () => {
+			try {
+				if (cameraRef.current && !cameraRef.current.pictureInPictureElement) {
+					cameraRef.current.requestPictureInPicture();
+					return;
+				}
+				console.log(
+					'Error: Picture in Picture is not supported in this browser'
+				);
+			} catch (error) {
+				console.log('Error al entrar al modo de PiP ', error);
+			}
+		};
+
+		if (cameraRef.current) {
+			cameraRef.current.addEventListener(
+				'leavepictureinpicture',
+				handleCameraPiPChange
+			);
+		}
+
+		return () => {
+			if (cameraRef.current) {
+				cameraRef.current.removeEventListener(
+					'leavepictureinpicture',
+					handleCameraPiPChange
+				);
+			}
+		};
+	}, []); */
+
+	useEffect(() => {
+		const handleCameraPiPUnavailable = () => {
+			console.log('Error: Picture in Picture is not supported in this browser');
+		};
+
+		if (!document.pictureInPictureEnabled) {
+			handleCameraPiPUnavailable();
+		}
+
+		return () => {
+			handleCameraPiPUnavailable();
+		};
+	}, []);
 
 	const handleCameraTogglePiP = () => {
 		if (!document.pictureInPictureEnabled) {
@@ -114,50 +183,7 @@ const VideoPlayer = ({
 				{recording.camera.active ? (
 					<section className="max-w-52 bg-neutral-900 absolute right-0 bottom-0 m-5 rounded-md">
 						<video ref={cameraRef} autoPlay muted></video>
-						<button
-							onClick={handleCameraTogglePiP}
-							className="absolute bottom-0 right-0 m-2"
-						>
-							{cameraPiP ? (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="icon icon-tabler icons-tabler-outline icon-tabler-picture-in-picture-off"
-								>
-									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-									<path d="M11 19h-6a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v4" />
-									<path d="M14 14m0 1a1 1 0 0 1 1 -1h5a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-5a1 1 0 0 1 -1 -1z" />
-									<path d="M7 9l4 4" />
-									<path d="M7 12v-3h3" />
-								</svg>
-							) : (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="icon icon-tabler icons-tabler-outline icon-tabler-picture-in-picture-on"
-								>
-									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-									<path d="M11 19h-6a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v4" />
-									<path d="M14 14m0 1a1 1 0 0 1 1 -1h5a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-5a1 1 0 0 1 -1 -1z" />
-									<path d="M7 9l4 4" />
-									<path d="M8 13h3v-3" />
-								</svg>
-							)}
-						</button>
+						<button onClick={() => handleCameraTogglePiP()}>Cambiar modo</button>
 					</section>
 				) : null}
 
