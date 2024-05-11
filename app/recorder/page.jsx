@@ -28,15 +28,6 @@ const Recorder = () => {
 					mediaRecorderRef.current = recording.mediaRecorder;
 					screenStreamRef.current.srcObject = recording.screenAndAudioStream;
 					cameraStreamRef.current.srcObject = recording.cameraAndMicStream;
-
-					/* console.log({
-						mediaRef,
-						mediaRecorderRef,
-						screenStreamRef,
-						cameraStreamRef,
-					}); */
-
-					//console.log(recording);
 				}
 			} catch (error) {
 				console.log(error);

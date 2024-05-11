@@ -19,21 +19,22 @@ const VideoPlayer = ({
 	handlePauseRecording,
 	handleDownload,
 }) => {
-	const [isMuted, setIsMuted] = useState({
-		audio: false,
-		mic: false,
-	});
+	const [cameraPiP, setCameraPiP] = useState(true);
+
 	const { recording, setRecording } = useRecordingContext();
 	const screenRef = useRef({});
 	const cameraRef = useRef({});
 
 	useEffect(() => {
-		setRecording((prev) => ({
-			...prev,
-			screenStream: screenStreamRef,
-			cameraStream: cameraStreamRef,
-		}));
-	}, []);
+		const initialize = async () => {
+			setRecording((prev) => ({
+				...prev,
+				screenStream: screenStreamRef,
+				cameraStream: cameraStreamRef,
+			}));
+		};
+		initialize();
+	}, [cameraStreamRef, screenStreamRef]);
 
 	useEffect(() => {
 		if (screenRef.current && screenStreamRef) {
@@ -46,31 +47,50 @@ const VideoPlayer = ({
 	useEffect(() => {
 		if (cameraRef.current && cameraStreamRef) {
 			cameraRef.current.srcObject = cameraStreamRef;
-
 			return;
 		}
 		cameraRef.current.srcObject = recording.cameraStream;
 	}, [cameraStreamRef]);
 
-	const handleIsMuted = ({ type }) => {
-		if (type === 'audio') {
-			screenRef.current.muted = !isMuted;
-			// silenciar tambien el audio del video
+	const handleCameraTogglePiP = () => {
+		if (!document.pictureInPictureEnabled) {
+			console.log('Error: Picture in Picture is not supported in this browser');
+			setCameraPiP(false);
+			return;
 		}
 
-		if (type === 'mic') {
-			cameraRef.current.muted = !isMuted;
+		try {
+			if (document.pictureInPictureElement) {
+				document.exitPictureInPicture();
+				setCameraPiP(false);
+			} else {
+				if (cameraRef.current && cameraRef.current.srcObject) {
+					cameraRef.current.requestPictureInPicture();
+					setCameraPiP(true);
+				}
+			}
+		} catch (error) {
+			console.log(error);
 		}
-
-		setIsMuted({ ...isMuted, [type]: !isMuted[type] });
 	};
+
+	/* useEffect(() => {
+		if (!(cameraRef.current && recording.cameraStream)) {
+			return;
+		}
+		if (
+			cameraRef.current &&
+			recording.cameraStream &&
+			recording.cameraStream.getVideoTracks().length > 0
+		) {
+			setCameraPiP(true);
+			handleCameraTogglePiP();
+		}
+	}, [recording.cameraStream]); */
 
 	return (
 		<main className="h-screen w-full flex flex-col items-center  ">
 			<header>
-				{/* <span className="text-sm font-bold text-left text-gray-500">
-					Estado
-				</span> */}
 				<h1
 					className={`text-4xl font-bold ${
 						recording.isPaused ? 'text-red-500' : 'text-green-500'
@@ -82,22 +102,63 @@ const VideoPlayer = ({
 
 			{/* Video Stream with pause and stop options */}
 			<section className=" ">
-				{recording.screen ? (
+				{recording.screen.active ? (
 					<video
 						ref={screenRef}
 						autoPlay
-						muted={isMuted['audio']}
+						muted
 						className="max-w-3xl bg-neutral-900 opacity-50"
 					></video>
 				) : null}
 
-				{recording.camera ? (
-					<video
-						ref={cameraRef}
-						autoPlay
-						muted={isMuted['mic']}
-						className="max-w-48 bg-neutral-900 absolute right-0 bottom-0 m-5 rounded-md"
-					></video>
+				{recording.camera.active ? (
+					<section className="max-w-52 bg-neutral-900 absolute right-0 bottom-0 m-5 rounded-md">
+						<video ref={cameraRef} autoPlay muted></video>
+						<button
+							onClick={handleCameraTogglePiP}
+							className="absolute bottom-0 right-0 m-2"
+						>
+							{cameraPiP ? (
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="icon icon-tabler icons-tabler-outline icon-tabler-picture-in-picture-off"
+								>
+									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+									<path d="M11 19h-6a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v4" />
+									<path d="M14 14m0 1a1 1 0 0 1 1 -1h5a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-5a1 1 0 0 1 -1 -1z" />
+									<path d="M7 9l4 4" />
+									<path d="M7 12v-3h3" />
+								</svg>
+							) : (
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="icon icon-tabler icons-tabler-outline icon-tabler-picture-in-picture-on"
+								>
+									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+									<path d="M11 19h-6a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v4" />
+									<path d="M14 14m0 1a1 1 0 0 1 1 -1h5a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-5a1 1 0 0 1 -1 -1z" />
+									<path d="M7 9l4 4" />
+									<path d="M8 13h3v-3" />
+								</svg>
+							)}
+						</button>
+					</section>
 				) : null}
 
 				<section className="flex gap-5  ">
@@ -149,7 +210,7 @@ const VideoPlayer = ({
 						)}
 					</section>
 
-					{/* Muted btn */}
+					{/* 
 					<button onClick={() => handleIsMuted({ type: 'audio' })}>
 						{isMuted['audio'] ? (
 							<>
@@ -193,7 +254,7 @@ const VideoPlayer = ({
 						)}
 					</button>
 
-					{/* Muted Mic btn */}
+					
 					<button onClick={() => handleIsMuted({ type: 'mic' })}>
 						{isMuted['mic'] ? (
 							<>
@@ -239,7 +300,7 @@ const VideoPlayer = ({
 								</svg>
 							</>
 						)}
-					</button>
+					</button> */}
 
 					{/* Stop and Download btn */}
 					<button

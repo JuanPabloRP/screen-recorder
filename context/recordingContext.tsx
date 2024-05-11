@@ -19,10 +19,10 @@ export function RecordingWrapper({ children }: { children: React.ReactNode }) {
 		},
 		screenAndAudioStream: {},
 		camera: {
-			active: true,
+			active: false,
 		},
 		mic: {
-			active: true,
+			active: false,
 		},
 		cameraAndMicStream: {},
 		fps: 30,
