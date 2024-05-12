@@ -23,6 +23,7 @@ const VideoPlayer = ({
 	const screenRef = useRef({});
 	const cameraRef = useRef({});
 
+	// initialize screenStream with screenStreamRef and cameraStream with cameraStreamRef
 	useEffect(() => {
 		const initialize = async () => {
 			setRecording((prev) => ({
@@ -34,6 +35,7 @@ const VideoPlayer = ({
 		initialize();
 	}, [cameraStreamRef, screenStreamRef]);
 
+	// Set the screenStreamRef to the screenRef
 	useEffect(() => {
 		if (screenRef.current && screenStreamRef) {
 			screenRef.current.srcObject = screenStreamRef;
@@ -42,6 +44,7 @@ const VideoPlayer = ({
 		screenRef.current.srcObject = recording.screenStream;
 	}, [screenStreamRef]);
 
+	// Set the cameraStreamRef to the cameraRef
 	useEffect(() => {
 		if (cameraRef.current && cameraStreamRef) {
 			cameraRef.current.srcObject = cameraStreamRef;
@@ -50,7 +53,12 @@ const VideoPlayer = ({
 		cameraRef.current.srcObject = recording.cameraStream;
 	}, [cameraStreamRef]);
 
+	// Picture in Picture mode
 	useEffect(() => {
+		if (!recording.camera.active) {
+			return;
+		}
+
 		const handleCameraPiPMode = () => {
 			try {
 				if (cameraRef.current) {
@@ -61,7 +69,7 @@ const VideoPlayer = ({
 			}
 		};
 
-		if (cameraRef.current) {
+		if (cameraRef?.current) {
 			cameraRef.current.addEventListener('loadedmetadata', handleCameraPiPMode);
 		}
 
@@ -107,6 +115,7 @@ const VideoPlayer = ({
 		};
 	}, []); */
 
+	// Check if the browser supports Picture in Picture
 	useEffect(() => {
 		const handleCameraPiPUnavailable = () => {
 			console.log('Error: Picture in Picture is not supported in this browser');
@@ -121,6 +130,7 @@ const VideoPlayer = ({
 		};
 	}, []);
 
+	// Picture in Picture mode
 	const handleCameraTogglePiP = () => {
 		if (!document.pictureInPictureEnabled) {
 			console.log('Error: Picture in Picture is not supported in this browser');
@@ -183,7 +193,9 @@ const VideoPlayer = ({
 				{recording.camera.active ? (
 					<section className="max-w-52 bg-neutral-900 absolute right-0 bottom-0 m-5 rounded-md">
 						<video ref={cameraRef} autoPlay muted></video>
-						<button onClick={() => handleCameraTogglePiP()}>Cambiar modo</button>
+						<button onClick={() => handleCameraTogglePiP()}>
+							Cambiar modo
+						</button>
 					</section>
 				) : null}
 

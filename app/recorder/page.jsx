@@ -40,7 +40,7 @@ const Recorder = () => {
 	const handleStartRecording = async () => {
 		try {
 			const screenMedia = await navigator.mediaDevices.getDisplayMedia({
-				video: { frameRate: { ideal: recording.fps } },
+				video: { frameRate: { ideal: recording.config.frameRate.value } },
 				audio: recording.audio.active,
 			});
 
@@ -176,7 +176,14 @@ const Recorder = () => {
 			//console.log(e.target.id);
 			const { id } = e.target;
 
-			const updatedRecording = { ...recording, fps: id };
+			const updatedRecording = {
+				...recording,
+				config: {
+					...recording.config,
+					frameRate: { ...recording.config.frameRate, value: id },
+				},
+			};
+
 			setRecording(updatedRecording);
 		}
 
@@ -226,19 +233,19 @@ const Recorder = () => {
 			{
 				id: '25',
 				title: '25',
-				active: recording.fps == 25,
+				active: recording.config.frameRate.value == 25,
 				disabled: recording.isRecording,
 			},
 			{
 				id: '30',
 				title: '30 (Por defecto)',
-				active: recording.fps == 30,
+				active: recording.config.frameRate.value == 30,
 				disabled: recording.isRecording,
 			},
 			{
 				id: '60',
 				title: '60',
-				active: recording.fps == 60,
+				active: recording.config.frameRate.value == 60,
 				disabled: recording.isRecording,
 			},
 		],
@@ -288,7 +295,7 @@ export default Recorder;
 	const handleStartRecording = async () => {
 		try {
 			const media = await navigator.mediaDevices.getDisplayMedia({
-				video: { frameRate: { ideal: recording.fps } },
+				video: { frameRate: { ideal: recording.config.frameRate.value } },
 				audio: recording.audio,
 			});
 

@@ -17,7 +17,9 @@ export function RecordingWrapper({ children }: { children: React.ReactNode }) {
 		audio: {
 			active: true,
 		},
-		screenAndAudioStream: {},
+		screenAndAudioStream: {
+			
+		},
 		camera: {
 			active: false,
 		},
@@ -25,11 +27,21 @@ export function RecordingWrapper({ children }: { children: React.ReactNode }) {
 			active: false,
 		},
 		cameraAndMicStream: {},
-		fps: 30,
 		isRecording: false,
 		isPaused: false,
 		mediaRecorder: {},
 		media: {},
+		config: {
+			resolution: {},
+			quality: {},
+			codec: {},
+			fileType: {},
+			frameRate: {
+				value: 30,
+			},
+			audioBitRate: {},
+			videoBitRate: {},
+		},
 	});
 
 	return (

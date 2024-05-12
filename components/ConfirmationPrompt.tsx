@@ -19,9 +19,8 @@ const ConfirmationPrompt = () => {
 		};
 	}, []);
 	return (
-		<div>
-			<p></p>
-		</div>
+		<>
+		</>
 	);
 };
 

@@ -38,7 +38,9 @@ const RecordingOptions = ({
 						<li
 							key={index}
 							className={`flex flex-col gap-3 justify-center items-center w-36 h-36 rounded-md border border-congress-blue-600  ${
-								active ? 'bg-congress-blue-600' : ''
+								active
+									? 'bg-congress-blue-600  hover:bg-congress-blue-600/80 '
+									: 'hover:bg-congress-blue-600/60 '
 							}  relative`}
 						>
 							<article
