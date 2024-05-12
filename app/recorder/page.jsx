@@ -203,50 +203,59 @@ const Recorder = () => {
 			{
 				id: 'screen',
 				title: 'Grabar pantalla',
-				active: true,
+				isActive: true,
 				svg: screen,
 				text: 'Pantalla',
 			},
 			{
 				id: 'audio',
 				title: 'Grabar audio',
-				active: recording.audio.active,
+				isActive: recording.audio.active,
 				svg: audio,
 				text: 'Audio',
 			},
 			{
 				id: 'camera',
 				title: 'Grabar cámara',
-				active: recording.camera.active,
+				isActive: recording.camera.active,
 				svg: video,
 				text: 'Cámara',
 			},
 			{
 				id: 'mic',
 				title: 'Grabar micrófono',
-				active: recording.mic.active,
+				isActive: recording.mic.active,
 				svg: mic,
 				text: 'Micrófono',
 			},
 		],
-		FPSoptions: [
+	};
+
+	const configOptions = {
+		fpsOptions: [
 			{
-				id: '25',
-				title: '25',
-				active: recording.config.frameRate.value == 25,
-				disabled: recording.isRecording,
+				id: 25,
+				name: '25',
+				isActive: recording.config.frameRate.value === 25,
+				isDisabled: recording.isRecording,
 			},
 			{
-				id: '30',
-				title: '30 (Por defecto)',
-				active: recording.config.frameRate.value == 30,
-				disabled: recording.isRecording,
+				id: 30,
+				name: '30 (Por defecto)',
+				isActive: recording.config.frameRate.value === 30,
+				isDisabled: recording.isRecording,
 			},
 			{
-				id: '60',
-				title: '60',
-				active: recording.config.frameRate.value == 60,
-				disabled: recording.isRecording,
+				id: 60,
+				name: '60',
+				isActive: recording.config.frameRate.value === 60,
+				isDisabled: recording.isRecording,
+			},
+			{
+				id: 120,
+				name: '120',
+				isActive: recording.config.frameRate.value === 120,
+				isDisabled: true,
 			},
 		],
 	};
@@ -257,6 +266,7 @@ const Recorder = () => {
 				<RecordingOptions
 					handleStartRecording={handleStartRecording}
 					btnOptions={btnOptions}
+					configOptions={configOptions}
 					handleRecordingOptions={handleRecordingOptions}
 				/>
 			) : (
