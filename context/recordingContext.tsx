@@ -26,7 +26,9 @@ export function RecordingWrapper({ children }: { children: React.ReactNode }) {
 		mic: {
 			active: false,
 		},
-		cameraAndMicStream: {},
+		cameraAndMicStream: {
+			
+		},
 		isRecording: false,
 		isPaused: false,
 		mediaRecorder: {},

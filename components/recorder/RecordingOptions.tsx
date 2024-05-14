@@ -75,7 +75,28 @@ const RecordingOptions = ({
 				</ul>
 			</section>
 
-			{/* <section>
+			<button
+				onClick={() => handleStartRecording()}
+				className="mx-auto  text-center text-lg font-bold text-neutral-50 bg-green-700 p-2 rounded-md hover:bg-green-800 focus:bg-green-900 focus:text-congress-blue-100"
+			>
+				Empezar a grabar
+			</button>
+
+			<section>
+				<Dropdown
+					type="frameRate"
+					title="FPS deseados"
+					options={configOptions.fpsOptions}
+				/>
+			</section>
+		</main>
+	);
+};
+
+export default RecordingOptions;
+
+
+	/* <section>
 				<h2 className="text-2xl">FPS deseados</h2>
 				<ul className="flex justify-between  gap-5">
 					{btnOptions.FPSoptions.map(
@@ -98,24 +119,5 @@ const RecordingOptions = ({
 						)
 					)}
 				</ul>
-			</section> */}
+			</section> */
 
-			<section>
-				<Dropdown
-					type="frameRate"
-					title="FPS deseados"
-					options={configOptions.fpsOptions}
-				/>
-			</section>
-
-			<button
-				onClick={() => handleStartRecording()}
-				className="mx-auto  text-center text-lg bg-congress-blue-500 p-2 rounded-md hover:bg-congress-blue-600 focus:bg-congress-blue-800 focus:text-congress-blue-100"
-			>
-				Empezar
-			</button>
-		</main>
-	);
-};
-
-export default RecordingOptions;

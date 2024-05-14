@@ -2,7 +2,7 @@
 
 import { useRecordingContext } from '@/context/recordingContext';
 import Link from 'next/link';
-import { use, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /* interface VideoPlayerProps {
 	screenStreamRef: MediaStream;
@@ -134,18 +134,18 @@ const VideoPlayer = ({
 	const handleCameraTogglePiP = () => {
 		if (!document.pictureInPictureEnabled) {
 			console.log('Error: Picture in Picture is not supported in this browser');
-			setCameraPiP(false);
+			
 			return;
 		}
 
 		try {
 			if (document.pictureInPictureElement) {
 				document.exitPictureInPicture();
-				setCameraPiP(false);
+				
 			} else {
 				if (cameraRef.current && cameraRef.current.srcObject) {
 					cameraRef.current.requestPictureInPicture();
-					setCameraPiP(true);
+					
 				}
 			}
 		} catch (error) {
@@ -162,10 +162,20 @@ const VideoPlayer = ({
 			recording.cameraStream &&
 			recording.cameraStream.getVideoTracks().length > 0
 		) {
-			setCameraPiP(true);
+			
 			handleCameraTogglePiP();
 		}
 	}, [recording.cameraStream]); */
+
+	// TEMPORARY FUNCTION
+	// this function is used to end the recording and close the Picture in Picture mode
+
+	const handleEndRecordingWithPiPfunc = async () => {
+		if (document.pictureInPictureElement) {
+			document.exitPictureInPicture();
+		}
+		handleEndRecording();
+	};
 
 	return (
 		<main className="h-screen w-full flex flex-col items-center  ">
@@ -343,7 +353,7 @@ const VideoPlayer = ({
 					{/* Stop and Download btn */}
 					<button
 						className='className="mx-auto  text-center text-lg bg-red-500 p-2 rounded-md hover:bg-red-600 focus:bg-red-800 focus:text-congress-blue-100'
-						onClick={() => handleEndRecording()}
+						onClick={() => handleEndRecordingWithPiPfunc()}
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"

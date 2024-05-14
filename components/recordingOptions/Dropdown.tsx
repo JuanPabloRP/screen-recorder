@@ -49,7 +49,9 @@ const Dropdown = ({ type, title, options }: DropdownProps) => {
 						key={id ?? index}
 						className={` fill-slate-950 border border-congress-blue-600   hover:border-congress-blue-900 ${
 							isActive ? 'bg-congress-blue-600' : ''
-						}  ${isDisabled ? 'text-neutral-800 bg-neutral-950' : ''} `}
+						}  ${
+							isDisabled ? 'text-neutral-800 bg-neutral-950' : ''
+						} first:rounded-t-md last:rounded-b-md`}
 					>
 						<button
 							className={`w-full h-full p-2`}
