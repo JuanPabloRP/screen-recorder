@@ -17,6 +17,7 @@ const Recorder = () => {
 	const screenStreamRef = useRef({});
 	const cameraStreamRef = useRef({});
 
+	// Cuando el usuario este grabando pantalla y en la pagina vaya a la pagina de inicio no se pierda el objecto de grabacion
 	useEffect(() => {
 		const initialize = async () => {
 			try {
@@ -55,19 +56,15 @@ const Recorder = () => {
 					audio: micExist && recording.mic.active,
 				});
 
-				/* cameraMedia.getTracks().forEach((track) => {
-					screenMedia.addTrack(track);
-				});
-				*/
-
 				cameraStreamRef.current.srcObject = cameraMedia;
 			}
 
 			//Set the video stream to the video element
 			screenStreamRef.current.srcObject = screenMedia;
 
-			//Reload the video element <- INVESTIGATE WHY THIS IS NECESSARY ksjkjs
-			cameraStreamRef.current.srcObject = cameraStreamRef.current.srcObject;
+			/* //Reload the video element <- INVESTIGATE WHY THIS IS NECESSARY ksjkjs
+			cameraStreamRef.current.srcObject = cameraStreamRef.current.srcObject; */
+
 			if (recording.camera.active || recording.mic.active) {
 				cameraStreamRef.current.srcObject.getTracks().forEach((track) => {
 					screenMedia.addTrack(track);
@@ -250,12 +247,6 @@ const Recorder = () => {
 				name: '60',
 				isActive: recording.config.frameRate.value === 60,
 				isDisabled: recording.isRecording,
-			},
-			{
-				id: 120,
-				name: '120',
-				isActive: recording.config.frameRate.value === 120,
-				isDisabled: true,
 			},
 		],
 	};
