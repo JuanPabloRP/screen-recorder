@@ -12,6 +12,3 @@ export const checkDeviceExistence = async ({ type }: ICheckDevice) => {
 	}
 };
 
-export interface MediaElementWithSrcObject extends HTMLMediaElement {
-	srcObject: MediaStream | null;
-}
