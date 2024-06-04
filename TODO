@@ -1,10 +1,13 @@
-1. Que se quite la camara cuando esta en PiP cuando se le de a acabar grabacion 🚧🛠️
-2. Cuando se le de stop al media (La barrita que sale abajo cuando se comparte pantalla) se termine tambien la grabacion
-3. Cambiar la eleccion de fps a una lista (dropdown) ✅
-4. Agregar las opciones de poder elegir la calidad, la resolucion, coded, tipo de formato, cantidad de bits por segundo tanto para video como para audio
-5. Letrero que avise que cuando se comparta todas la pantalla se debe de activa el audio manualmente
-6. Cambiar estilos botones de "¿Que desea grabar?" ✅
-7. Hacer uso de custom hooks para el tema de la camara y de la pantalla
-8. Mejorar el contexto 🚧🛠️
-9. Guardar en el contexto el srcObject
-10. Pasar configuraciones de la grabacion a un JSON
+- Que se quite la camara cuando esta en PiP cuando se le de a acabar grabacion 🚧🛠️
+- Usar useReducer para el manejo de la configuracion de la grabacion 🚧🛠️
+- Mejorar el contexto 🚧🛠️
+
+- Cuando se le de stop al media (La barrita que sale abajo cuando se comparte pantalla) se termine tambien la grabacion
+- Agregar las opciones de poder elegir la calidad, la resolucion, coded, tipo de formato, cantidad de bits por segundo tanto para video como para audio
+- Letrero que avise que cuando se comparta todas la pantalla se debe de activa el audio manualmente
+- Hacer uso de custom hooks para el tema de la camara y de la pantalla
+- Guardar en el contexto el srcObject ✅
+- Pasar configuraciones de la grabacion a un JSON
+
+- Cambiar la eleccion de fps a una lista (dropdown) ✅
+- Cambiar estilos botones de "¿Que desea grabar?" ✅

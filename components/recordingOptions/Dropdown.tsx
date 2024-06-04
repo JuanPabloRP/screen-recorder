@@ -1,6 +1,7 @@
 import { useRecordingContext } from '@/context/recordingContext';
 import { useState } from 'react';
 
+
 type DropdownProps = {
 	type: string;
 	title: string;
@@ -16,11 +17,24 @@ type Option = {
 
 const Dropdown = ({ type, title, options }: DropdownProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const { recording, setRecording } = useRecordingContext();
+	const { state, dispatch } = useRecordingContext();
 
 	const handleOptionChange = ({ id, name }: Option) => {
 		console.log(`Option ${name} with id ${id} was clicked`);
 
+		dispatch({
+			type: 'SET_RECORDING',
+			payload: {
+				config: {
+					...state.config,
+					[type]: {
+						...state.config[type],
+						value: id,
+					},
+				},
+			},
+		});
+		/* 
 		setRecording((prev: any) => ({
 			...prev,
 			config: {
@@ -30,7 +44,7 @@ const Dropdown = ({ type, title, options }: DropdownProps) => {
 					value: id,
 				},
 			},
-		}));
+		})); */
 
 		setIsOpen(false);
 	};
