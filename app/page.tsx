@@ -28,17 +28,17 @@ export default function Home() {
 					</div>
 				</header>
 				<section className="flex flex-wrap justify-center  gap-4 mt-2">
-					<article className="max-w-72 bg-congress-blue-950 p-5 rounded-md border border-transparent hover:border-congress-blue-800 transition-all ">
+					<article className="w-72 bg-congress-blue-950 p-5 rounded-md border border-transparent hover:border-congress-blue-800 transition-all ">
 						<h2 className="text-xl  font-bold">¿Es seguro?</h2>
 						<p className="text-congress-blue-300">
 							Sí, la web es completamnete segura
 						</p>
 					</article>
-					<article className="max-w-72 bg-congress-blue-950 p-5 rounded-md border border-transparent hover:border-congress-blue-800 transition-all ">
+					<article className="w-72 bg-congress-blue-950 p-5 rounded-md border border-transparent hover:border-congress-blue-800 transition-all ">
 						<h2 className="text-xl  font-bold">¿Es totalmente gratis?</h2>
 						<p className="text-congress-blue-300">Sí, su uso es 100% gratis</p>
 					</article>
-					<article className="max-w-72 bg-congress-blue-950 p-5 rounded-md border border-transparent hover:border-congress-blue-800 transition-all ">
+					<article className="w-72 bg-congress-blue-950 p-5 rounded-md border border-transparent hover:border-congress-blue-800 transition-all ">
 						<h2 className="text-xl  font-bold">¿Cómo aporto?</h2>
 						<p className="text-congress-blue-300">
 							Puedes apoyar este proyecto aportando en el{' '}
