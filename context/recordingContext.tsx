@@ -30,7 +30,9 @@ const initialState = {
 		resolution: {},
 		quality: {},
 		codec: {},
-		fileType: {},
+		fileType: {
+			value: 'video/webm',
+		},
 		frameRate: {
 			value: 30,
 		},
