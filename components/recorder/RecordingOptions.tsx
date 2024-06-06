@@ -3,6 +3,7 @@ import { useRecordingContext } from '@/context/recordingContext';
 import { StaticImport } from 'next/dist/shared/lib/get-img-props';
 import Image from 'next/image';
 import Dropdown from '../recordingOptions/Dropdown';
+import GroupButton from '../recordingOptions/GroupButtons';
 import { useConfigOptions } from '@/hooks/useRecordingConfig';
 import useRecording from '@/hooks/useRecording';
 
@@ -33,7 +34,7 @@ interface RecordingOptionsProps {
 
 const RecordingOptions = () => {
 	const { state, dispatch } = useRecordingContext();
-	const { recordingOptions, fpsOptions } = useConfigOptions();
+	const { recordingOptions, fpsOptions, fileTypeOptions } = useConfigOptions();
 	const { startRecording, handleRecordingOptions } = useRecording();
 
 	return (
@@ -79,7 +80,12 @@ const RecordingOptions = () => {
 			</button>
 
 			<section>
-				<Dropdown type="frameRate" title="FPS deseados" options={fpsOptions} />
+				<GroupButton
+					type="frameRate"
+					title="FPS deseados"
+					options={fpsOptions}
+				/>
+				
 			</section>
 		</main>
 	);
