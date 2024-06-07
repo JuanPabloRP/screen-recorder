@@ -2,15 +2,8 @@
 
 import { useRecordingContext } from '@/context/recordingContext';
 import useRecording from '@/hooks/useRecording';
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
-/* interface VideoPlayerProps {
-	screenAndAudioStream: MediaStream;
-	handleEndRecording: () => void;
-	handleContinueRecording: () => void;
-	handlePauseRecording: () => void;
-} */
 
 const VideoPlayer = ({}) => {
 	const { state, dispatch } = useRecordingContext();
@@ -33,38 +26,6 @@ const VideoPlayer = ({}) => {
 			}
 		})();
 	}, []);
-
-	/* useEffect(() => {
-		const handleCameraPiPChange = () => {
-			try {
-				if (cameraAndMicRef.current && !cameraAndMicRef.current.pictureInPictureElement) {
-					cameraAndMicRef.current.requestPictureInPicture();
-					return;
-				}
-				console.log(
-					'Error: Picture in Picture is not supported in this browser'
-				);
-			} catch (error) {
-				console.log('Error al entrar al modo de PiP ', error);
-			}
-		};
-
-		if (cameraAndMicRef.current) {
-			cameraAndMicRef.current.addEventListener(
-				'leavepictureinpicture',
-				handleCameraPiPChange
-			);
-		}
-
-		return () => {
-			if (cameraAndMicRef.current) {
-				cameraAndMicRef.current.removeEventListener(
-					'leavepictureinpicture',
-					handleCameraPiPChange
-				);
-			}
-		};
-	}, []); */
 
 	useEffect(() => {
 		if (screenAndAudioRef.current)
@@ -184,106 +145,3 @@ const VideoPlayer = ({}) => {
 };
 
 export default VideoPlayer;
-
-//
-/* useEffect(() => {
-		if (state.isPaused) {
-			setIsMuted(true);
-			screenRef.current.muted = true;
-		}
-	}, [state.isMuted, state.isPaused, isMuted]); */
-
-//
-{
-	/* 
-					<button onClick={() => handleIsMuted({ type: 'audio' })}>
-						{isMuted['audio'] ? (
-							<>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									className="icon icon-tabler icons-tabler-outline icon-tabler-volume-3"
-								>
-									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-									<path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
-									<path d="M16 10l4 4m0 -4l-4 4" />
-								</svg>
-							</>
-						) : (
-							<>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									className="icon icon-tabler icons-tabler-outline icon-tabler-volume"
-								>
-									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-									<path d="M15 8a5 5 0 0 1 0 8" />
-									<path d="M17.7 5a9 9 0 0 1 0 14" />
-									<path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
-								</svg>
-							</>
-						)}
-					</button>
-
-					
-					<button onClick={() => handleIsMuted({ type: 'mic' })}>
-						{isMuted['mic'] ? (
-							<>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									className="icon icon-tabler icons-tabler-outline icon-tabler-microphone-off"
-								>
-									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-									<path d="M3 3l18 18" />
-									<path d="M9 5a3 3 0 0 1 6 0v5a3 3 0 0 1 -.13 .874m-2 2a3 3 0 0 1 -3.87 -2.872v-1" />
-									<path d="M5 10a7 7 0 0 0 10.846 5.85m2 -2a6.967 6.967 0 0 0 1.152 -3.85" />
-									<path d="M8 21l8 0" />
-									<path d="M12 17l0 4" />
-								</svg>
-							</>
-						) : (
-							<>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									className="icon icon-tabler icons-tabler-outline icon-tabler-microphone"
-								>
-									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-									<path d="M9 2m0 3a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z" />
-									<path d="M5 10a7 7 0 0 0 14 0" />
-									<path d="M8 21l8 0" />
-									<path d="M12 17l0 4" />
-								</svg>
-							</>
-						)}
-					</button> */
-}
