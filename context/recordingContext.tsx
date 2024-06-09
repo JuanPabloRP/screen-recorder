@@ -1,6 +1,6 @@
 'use client';
 import { createContext, useContext, useState, useReducer } from 'react';
-import { ACTIONS } from '@/utils/CONSTANTS';
+import { ACTIONS, RECORDING_STATE } from '@/utils/CONSTANTS';
 /* type RecordingContextType = {
 
 }
@@ -8,6 +8,7 @@ const RecordingContext = createContext<RecordingContextType>(undefined);
 */
 
 const initialState = {
+	recordingState: RECORDING_STATE.INACTIVE,
 	screen: {
 		isActive: true,
 	},
@@ -22,26 +23,22 @@ const initialState = {
 		isActive: false,
 	},
 	cameraAndMicStream: {},
-	isRecording: false,
-	isPaused: false,
 	mediaRecorder: {},
-	media: {},
 	config: {
 		resolution: {},
 		quality: {},
-		codec: {},
 		fileType: {
 			value: 'video/webm',
 		},
 		frameRate: {
 			value: 30,
 		},
-		audioBitRate: {},
-		videoBitRate: {},
 	},
 };
 
 const recordingReducer = (state: any, action: any) => {
+	const { mediaRecorder } = action.payload;
+
 	switch (action.type) {
 		// Setters
 		case ACTIONS.SET_RECORDING:
@@ -53,20 +50,33 @@ const recordingReducer = (state: any, action: any) => {
 
 		// Recording actions
 		case ACTIONS.START_RECORDING:
-			const { mediaRecorder, media } = action.payload.updatedRecording;
 			return {
 				...state,
-				isRecording: true,
-				isPaused: false,
+				recordingState: RECORDING_STATE.RECORDING,
 				mediaRecorder: mediaRecorder,
-				media: media,
+			};
+		case ACTIONS.STOP_RECORDING:
+			return {
+				...state,
+				recordingState: RECORDING_STATE.STOPED,
 			};
 		case ACTIONS.END_RECORDING:
-			return { ...state, isRecording: false };
+			return {
+				...state,
+				recordingState: RECORDING_STATE.INACTIVE,
+				mediaRecorder: {},
+			};
 		case ACTIONS.PAUSE_RECORDING:
-			return { ...state, isPaused: true };
+			return {
+				...state,
+				recordingState: RECORDING_STATE.PAUSED,
+			};
 		case ACTIONS.CONTINUE_RECORDING:
-			return { ...state, isPaused: false };
+			return {
+				...state,
+				recordingState: RECORDING_STATE.RECORDING,
+			};
+
 		// Recording options
 		case ACTIONS.SET_SCREEN:
 			return { ...state };
@@ -78,12 +88,8 @@ const recordingReducer = (state: any, action: any) => {
 			return { ...state, mic: action.payload };
 
 		//
-		case ACTIONS.SET_IS_RECORDING:
-			return { ...state, isRecording: action.payload };
 		case ACTIONS.SET_MEDIA_RECORDER:
 			return { ...state, mediaRecorder: action.payload };
-		case ACTIONS.SET_MEDIA:
-			return { ...state, media: action.payload };
 		case ACTIONS.SET_RECORDING_OPTIONS:
 			return { ...state };
 		case ACTIONS.SET_FRAME_RATE:
