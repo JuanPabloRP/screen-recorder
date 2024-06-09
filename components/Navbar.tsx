@@ -7,7 +7,7 @@ const Navbar = () => {
 			className={`flex flex-col  justify-center items-center md:flex-row md:justify-between md:items-center  text-congress-blue-50 md:h-auto bg-[#141414] sticky top-0 z-50`}
 		>
 			<Link href="/" className="text-2xl p-5">
-				Screen recorder
+				Grabar pantalla
 			</Link>
 
 			<ul className="flex gap-2 mr-5">

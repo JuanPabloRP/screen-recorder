@@ -8,8 +8,8 @@ import { RecordingWrapper } from '@/context/recordingContext';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-	title: 'Grabador de pantalla',
-	description: 'Grabador de pantalla online y gratis',
+	title: 'Grabar pantalla',
+	description: 'Grabar pantalla online y gratis',
 };
 
 export default function RootLayout({
@@ -18,7 +18,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
+		<html lang="es">
 			<body className={inter.className}>
 				<RecordingWrapper>
 					<Navbar />
