@@ -1,6 +1,7 @@
 // Description: This file contains the functions that manage the recording configuration.
 import { useRecordingContext } from '@/context/recordingContext';
 import { useMemo } from 'react';
+
 import screen from '@/public/svg/screen.svg';
 import audio from '@/public/svg/audio.svg';
 import video from '@/public/svg/video.svg';
@@ -100,27 +101,6 @@ export const useConfigOptions = () => {
 		},
 	];
 
-	const codecOptions = [
-		{
-			id: 1,
-			name: 'H264',
-			isActive: state.config.codec.value === 1,
-			isDisabled: state.isRecording,
-		},
-		{
-			id: 2,
-			name: 'VP8',
-			isActive: state.config.codec.value === 2,
-			isDisabled: state.isRecording,
-		},
-		{
-			id: 3,
-			name: 'VP9',
-			isActive: state.config.codec.value === 3,
-			isDisabled: state.isRecording,
-		},
-	];
-
 	const fileTypeOptions = [
 		{
 			id: 1,
@@ -136,56 +116,11 @@ export const useConfigOptions = () => {
 		},
 	];
 
-	const audioBitRateOptions = [
-		{
-			id: 1,
-			name: 'Baja',
-			isActive: state.config.audioBitRate.value === 1,
-			isDisabled: state.isRecording,
-		},
-		{
-			id: 2,
-			name: 'Media',
-			isActive: state.config.audioBitRate.value === 2,
-			isDisabled: state.isRecording,
-		},
-		{
-			id: 3,
-			name: 'Alta',
-			isActive: state.config.audioBitRate.value === 3,
-			isDisabled: state.isRecording,
-		},
-	];
-
-	const videoBitRateOptions = [
-		{
-			id: 1,
-			name: 'Baja',
-			isActive: state.config.videoBitRate.value === 1,
-			isDisabled: state.isRecording,
-		},
-		{
-			id: 2,
-			name: 'Media',
-			isActive: state.config.videoBitRate.value === 2,
-			isDisabled: state.isRecording,
-		},
-		{
-			id: 3,
-			name: 'Alta',
-			isActive: state.config.videoBitRate.value === 3,
-			isDisabled: state.isRecording,
-		},
-	];
-
 	return {
 		recordingOptions,
 		fpsOptions,
 		resolutionOptions,
 		qualityOptions,
-		codecOptions,
 		fileTypeOptions,
-		audioBitRateOptions,
-		videoBitRateOptions,
 	};
 };
