@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { useRecordingContext } from '@/context/recordingContext';
-import { checkDeviceExistence } from '@/utils/helpers';
+import { checkDeviceExistence, getDevices } from '@/utils/helpers';
 
 const useCameraAndMic = () => {
 	const { state, dispatch } = useRecordingContext();
@@ -15,13 +15,16 @@ const useCameraAndMic = () => {
 
 	const getCameraAndMicMedia = useCallback(async () => {
 		try {
-			const isThereACamera = await checkDeviceExistence({ type: 'videoinput' });
-			const isThereAMic = await checkDeviceExistence({ type: 'audioinput' });
+			const idCamera = await checkDeviceExistence({ type: 'videoinput' });
+			const idMic = await checkDeviceExistence({ type: 'audioinput' });
 
 			const cameraAndMicMedia: MediaStream =
 				await navigator.mediaDevices.getUserMedia({
-					video: isThereACamera ? { frameRate: { ideal: 60 } } : false,
-					audio: isThereAMic ? {} : false,
+					video: {
+						deviceId: idCamera ? { exact: idCamera } : undefined,
+						frameRate: idCamera ? { ideal: 60 } : undefined,
+					},
+					audio: idMic ? { deviceId: { exact: idMic } } : undefined,
 				});
 
 			if (!cameraAndMicRef.current || !cameraAndMicMedia) {
@@ -101,7 +104,7 @@ const useCameraAndMic = () => {
 		};
 
 		if (cameraAndMicRef?.current) {
-			cameraAndMicRef.current.addEventListener(
+			(cameraAndMicRef.current as any).addEventListener(
 				'loadedmetadata',
 				handleCameraPiPMode
 			);
@@ -109,7 +112,7 @@ const useCameraAndMic = () => {
 
 		return () => {
 			if (cameraAndMicRef.current) {
-				cameraAndMicRef.current.removeEventListener(
+				(cameraAndMicRef.current as any).removeEventListener(
 					'loadedmetadata',
 					handleCameraPiPMode
 				);
@@ -124,6 +127,24 @@ const useCameraAndMic = () => {
 		}
 	};
 
+	const getCameraDevices = async () => {
+		try {
+			const cameras = await getDevices({ type: 'videoinput' });
+			return cameras;
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const getMicDevices = async () => {
+		try {
+			const mics = await getDevices({ type: 'audioinput' });
+			return mics;
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	return {
 		cameraAndMicRef,
 		getCameraAndMicMedia,
@@ -131,6 +152,8 @@ const useCameraAndMic = () => {
 		initializeCameraInPiPMode,
 		exitCameraInPictureInPicture,
 		toggleCameraPiP,
+		getCameraDevices,
+		getMicDevices,
 	};
 };
 

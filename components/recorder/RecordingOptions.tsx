@@ -39,16 +39,14 @@ const RecordingOptions = () => {
 	const { recordingOptions, fpsOptions, fileTypeOptions } = useConfigOptions();
 	const { startRecording, handleRecordingOptions } = useRecording();
 
-	const handleCameraSelector = () => {
-		console.log('a');
-	};
-
 	return (
 		<main className="min-h-screen flex flex-col  items-center gap-10 ">
+			{/* Que desea grabar */}
 			<section>
 				<h1 className="text-center text-4xl font-bold mb-5">
 					¿Que deseas grabar?
 				</h1>
+
 				<ul className="flex flex-wrap gap-5">
 					{recordingOptions.map(({ id, title, isActive, svg, text }, index) => (
 						<li
@@ -78,111 +76,19 @@ const RecordingOptions = () => {
 				</ul>
 			</section>
 
+			{/* Empezar a grabar */}
 			<button
 				onClick={startRecording}
 				className="mx-auto  text-center text-lg font-bold text-neutral-50 bg-green-700 p-2 rounded-md hover:bg-green-800 focus:bg-green-900 focus:text-congress-blue-100"
 			>
 				Empezar a grabar
 			</button>
-			<section className="flex flex-wrap gap-5 justify-center items-center ">
-				{/* Camara */}
-				<article>
-					{state.camera.isActive ? (
-						<>
-							<details open={true}>
-								<summary
-									//onClick={() => setIsOpen(!isOpen)}
-									className="cursor-pointer bg-congress-blue-600 p-2 mb-1 rounded-md min-w-48"
-								>
-									Escoge tu cámara
-								</summary>
-								<ul className="">
-									{/*options.map(
-									({ id, name, isActive, isDisabled }: Option, index) => (
-										<li
-											key={id ?? index}
-											className={` fill-slate-950 border border-congress-blue-600   hover:border-congress-blue-900 ${
-												isActive ? 'bg-congress-blue-600' : ''
-											}  ${
-												isDisabled ? 'text-neutral-800 bg-neutral-950' : ''
-											} first:rounded-t-md last:rounded-b-md`}
-										>
-											<button
-												className={`w-full h-full p-2`}
-												disabled={isDisabled}
-												onClick={() =>
-													handleOptionChange({ id, name, isActive, isDisabled })
-												}
-											>
-												{name}
-											</button>
-										</li>
-									)
-								)*/}
-								</ul>
-							</details>
-						</>
-					) : (
-						<>
-							<button
-								className=" text-left cursor-pointer bg-gray-600 p-2 mb-1 rounded-md min-w-48"
-								disabled
-							>
-								<span className="pl-4">Escoge tu cámara</span>
-							</button>
-						</>
-					)}
-				</article>
-				{/* Mic */}
-				<article>
-					{state.mic.isActive ? (
-						<>
-							<details open={true}>
-								<summary
-									//onClick={() => setIsOpen(!isOpen)}
-									className="cursor-pointer bg-congress-blue-600 p-2 mb-1 rounded-md  min-w-48"
-								>
-									Escoge tu micrófono
-								</summary>
-								<ul className="">
-									{/*options.map(
-									({ id, name, isActive, isDisabled }: Option, index) => (
-										<li
-											key={id ?? index}
-											className={` fill-slate-950 border border-congress-blue-600   hover:border-congress-blue-900 ${
-												isActive ? 'bg-congress-blue-600' : ''
-											}  ${
-												isDisabled ? 'text-neutral-800 bg-neutral-950' : ''
-											} first:rounded-t-md last:rounded-b-md`}
-										>
-											<button
-												className={`w-full h-full p-2`}
-												disabled={isDisabled}
-												onClick={() =>
-													handleOptionChange({ id, name, isActive, isDisabled })
-												}
-											>
-												{name}
-											</button>
-										</li>
-									)
-								)*/}
-								</ul>
-							</details>
-						</>
-					) : (
-						<>
-							<button
-								className=" text-left cursor-pointer bg-gray-600 p-2 mb-1 rounded-md min-w-48"
-								disabled
-							>
-								<span className="pl-4">Escoge tu micrófono</span>
-							</button>
-						</>
-					)}
-				</article>
-			</section>
 
+			{/* Elegir camara y microfono */}
+			{/* Cambiar xd */}
+
+			{/* Opciones de grabación */}
+			{/* Fps options */}
 			<section>
 				<GroupButton
 					type="frameRate"

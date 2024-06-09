@@ -3,8 +3,9 @@ import { useRecordingContext } from '@/context/recordingContext';
 
 const useScreenAndAudio = () => {
 	const { state, dispatch } = useRecordingContext();
-	const screenAndAudioRef = useRef({});
+	const screenAndAudioRef = useRef<MediaStream>();
 
+	/* Crea el media stream y lo retorna */
 	const getScreenAndAudioMedia = useCallback(async () => {
 		try {
 			const screenAndAudioMedia: MediaStream =
@@ -20,93 +21,36 @@ const useScreenAndAudio = () => {
 					audio: state.audio.isActive ? {} : false,
 				});
 
-			if (!screenAndAudioRef.current || !screenAndAudioMedia) {
+			if (!screenAndAudioMedia) {
+				console.log('No se pudo obtener el stream de pantalla y audio');
 				return;
 			}
 
 			screenAndAudioRef.current = screenAndAudioMedia;
 			(screenAndAudioRef.current as any).srcObject = screenAndAudioMedia;
 
-			return screenAndAudioMedia;
+			return screenAndAudioRef.current;
 		} catch (error) {
 			console.log((error as any).message);
 			return null;
 		}
 	}, [state, screenAndAudioRef]);
 
+	/* Lo guarda en el context */
 	const setScreenAndAudioStream = useCallback(
 		async ({ screenAndAudioMedia }: any) => {
 			dispatch({
 				type: 'SET_SCREEN_AND_AUDIO_STREAM',
-				payload: {
-					screenAndAudioMedia,
-					srcObject: (screenAndAudioRef.current as any).srcObject,
-				},
+				payload: screenAndAudioMedia,
 			});
 		},
 		[]
 	);
 
-	const setStartRecording = async (updatedRecording: any) => {
-		try {
-			dispatch({
-				type: 'START_RECORDING',
-				payload: {
-					updatedRecording,
-				},
-			});
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const setEndRecording = async ({ updatedRecording }: any) => {
-		try {
-			dispatch({
-				type: 'END_RECORDING',
-				payload: {
-					updatedRecording,
-				},
-			});
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const setPauseRecording = async ({ updatedRecording }: any) => {
-		try {
-			dispatch({
-				type: 'PAUSE_RECORDING',
-				payload: {
-					updatedRecording,
-				},
-			});
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const setContinueRecording = async ({ updatedRecording }: any) => {
-		try {
-			dispatch({
-				type: 'CONTINUE_RECORDING',
-				payload: {
-					updatedRecording,
-				},
-			});
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
 	return {
-		getScreenAndAudioMedia,
 		screenAndAudioRef,
+		getScreenAndAudioMedia,
 		setScreenAndAudioStream,
-		setStartRecording,
-		setEndRecording,
-		setPauseRecording,
-		setContinueRecording,
 	};
 };
 
