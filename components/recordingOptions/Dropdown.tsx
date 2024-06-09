@@ -1,25 +1,32 @@
 import { useRecordingContext } from '@/context/recordingContext';
 import { useState } from 'react';
 
-
 type DropdownProps = {
 	type: string;
 	title: string;
 	options: Option[];
+	handleChange: (option: Option) => void;
 };
 
 type Option = {
 	id: number;
 	name: string;
-	isActive: boolean;
+	isActive?: boolean;
 	isDisabled?: boolean;
 };
 
-const Dropdown = ({ type, title, options }: DropdownProps) => {
+const Dropdown = ({ type, title, options, handleChange }: DropdownProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const { state, dispatch } = useRecordingContext();
+	const { state } = useRecordingContext();
 
 	const handleOptionChange = ({ id, name }: Option) => {
+		console.log(`Option ${name} with id ${id} was clicked`);
+
+		handleChange({ id, name });
+		setIsOpen(false);
+	};
+
+	/* const handleOptionChange = ({ id, name }: Option) => {
 		console.log(`Option ${name} with id ${id} was clicked`);
 
 		dispatch({
@@ -34,20 +41,8 @@ const Dropdown = ({ type, title, options }: DropdownProps) => {
 				},
 			},
 		});
-		/* 
-		setRecording((prev: any) => ({
-			...prev,
-			config: {
-				...prev.config,
-				[type]: {
-					...prev.config[id],
-					value: id,
-				},
-			},
-		})); */
-
 		setIsOpen(false);
-	};
+	}; */
 
 	return (
 		<details open={true}>
