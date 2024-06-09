@@ -200,7 +200,7 @@ const useRecordingControls = () => {
 			return {
 				url,
 			};
-		} catch (error) {
+		} catch (error: any) {
 			console.log(error.message);
 			return {
 				url: '',
