@@ -1,8 +1,9 @@
-import Footer from '@/components/Footer';
-import Navbar from '@/components/Navbar';
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import Rec from '@/public/svg/rec1.svg';
+import { ROUTES_CONSTANTS } from '@/utils/routes.contants';
 
 export default function Home() {
 	return (
@@ -17,7 +18,11 @@ export default function Home() {
 							online y gratis
 						</p>
 						<Link
-							href={'/recorder'}
+							href={
+								ROUTES_CONSTANTS.find(
+									(r: RouteType) => r.key === 'SETUP_RECORDING'
+								)?.path
+							}
 							className="mx-auto  text-center text-lg bg-congress-blue-600 p-2 rounded-md hover:bg-congress-blue-700 focus:bg-congress-blue-800 focus:text-congress-blue-100"
 						>
 							Empezar a grabar

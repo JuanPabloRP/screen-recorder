@@ -2,12 +2,13 @@
 
 import { useRecordingContext } from '@/context/recordingContext';
 import useRecording from '@/hooks/useRecording';
-import { useEffect, useRef, useState } from 'react';
 import { RECORDING_STATE } from '@/utils/CONSTANTS';
+import { useEffect, useState } from 'react';
 
-const VideoPlayer = ({}) => {
-	const { state, dispatch } = useRecordingContext();
+const Recording = () => {
+	const { state } = useRecordingContext();
 	const { recordingState } = state;
+
 	const {
 		stopRecording,
 		endRecording,
@@ -46,13 +47,23 @@ const VideoPlayer = ({}) => {
 			cameraAndMicRef.current.srcObject = state.cameraAndMicStream.srcObject;
 	}, [cameraAndMicRef, state.cameraAndMicStream]);
 
-	const handleStopAndGetRecording = () => {
+	const goToRecordingPreview = () => {
 		stopRecording();
 		const recording = getRecording();
 		setRecordingVideo(recording.url);
+		console.log(recording.url);
 	};
 
-	console.log(recordingVideo);
+	if (
+		recordingState === RECORDING_STATE.INACTIVE ||
+		recordingState === RECORDING_STATE.STOPED
+	) {
+		return (
+			<section>
+				<h1>No se está grabando</h1>
+			</section>
+		);
+	}
 
 	return (
 		<main className="h-screen w-full flex flex-col items-center  ">
@@ -61,18 +72,15 @@ const VideoPlayer = ({}) => {
 					className={`text-4xl font-bold ${
 						recordingState === RECORDING_STATE.PAUSED
 							? 'text-red-500'
-							: 'text-green-500'
+							: 'text-blue-500'
 					} `}
 				>
 					{recordingState === RECORDING_STATE.PAUSED
 						? ' En pausa... 🛑'
-						: recordingState === RECORDING_STATE.STOPED
-						? 'Grabación... ✅'
 						: '  Grabando... 🎥'}
 				</h1>
 			</header>
 
-			{/* Video Stream with pause and stop options */}
 			{recordingState === RECORDING_STATE.RECORDING ||
 			recordingState === RECORDING_STATE.PAUSED ? (
 				<section className=" ">
@@ -147,7 +155,7 @@ const VideoPlayer = ({}) => {
 						{/* Stop and Download btn */}
 						<button
 							className='className="mx-auto  text-center text-lg bg-red-500 p-2 rounded-md hover:bg-red-600 focus:bg-red-800 focus:text-congress-blue-100'
-							onClick={handleStopAndGetRecording}
+							onClick={goToRecordingPreview}
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -168,35 +176,8 @@ const VideoPlayer = ({}) => {
 					</section>
 				</section>
 			) : null}
-
-			{/* Video recording with  pause, stop and download options  */}
-			{recordingState === RECORDING_STATE.STOPED ? (
-				<section>
-					{/* <video
-						src={recordingVideo}
-						autoPlay
-						muted
-						className="max-w-3xl bg-neutral-900 opacity-50"
-						controls
-					></video> */}
-					<footer className="flex gap-5">
-						<button
-							className="bg-congress-blue-600 p-2 rounded-md "
-							onClick={() => endRecording({ download: false })}
-						>
-							Volver a grabar
-						</button>
-						<button
-							className="bg-green-600 p-2 rounded-md "
-							onClick={() => endRecording({ download: true })}
-						>
-							Descargar
-						</button>
-					</footer>
-				</section>
-			) : null}
 		</main>
 	);
 };
 
-export default VideoPlayer;
+export default Recording;

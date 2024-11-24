@@ -39,6 +39,8 @@ const initialState = {
 const recordingReducer = (state: any, action: any) => {
 	const { mediaRecorder } = action.payload;
 
+	console.log(action);
+
 	switch (action.type) {
 		// Setters
 		case ACTIONS.SET_RECORDING:

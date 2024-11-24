@@ -1,21 +1,10 @@
 'use client';
+import { ROUTES_CONSTANTS } from '@/utils/routes.contants';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 
 const Navbar = () => {
 	const pathname = usePathname();
-
-	const routes = [
-		{
-			name: 'Inicio',
-			path: '/',
-		},
-		{
-			name: 'Empezar a grabar',
-			path: '/recorder',
-		},
-	];
 
 	const getLinkClass = (path: string) => {
 		return pathname === path
@@ -31,15 +20,15 @@ const Navbar = () => {
 			</Link>
 
 			<ul className="flex gap-2 mr-5 mb-5 md:mb-0">
-				{routes.map((route, index) => (
-					<li key={index}>
+				{ROUTES_CONSTANTS.map(({ name, path }: RouteType) => (
+					<li key={name}>
 						<Link
-							href={route.path}
+							href={path}
 							className={` font-semibold hover:text-congress-blue-100 ${getLinkClass(
-								route.path
+								path
 							)}`}
 						>
-							{route.name}
+							{name}
 						</Link>
 					</li>
 				))}

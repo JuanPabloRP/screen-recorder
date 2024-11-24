@@ -1,12 +1,6 @@
 import { useRecordingContext } from '@/context/recordingContext';
 import { useState } from 'react';
 
-type GroupButtonProps = {
-	type: string;
-	title: string;
-	options: Option[];
-};
-
 type Option = {
 	id: number;
 	name: string;
@@ -14,7 +8,15 @@ type Option = {
 	isDisabled?: boolean;
 };
 
-const GroupButton = ({ type, title, options }: GroupButtonProps) => {
+type OptionsGroup = {
+	type: string;
+	title: string;
+	options: Option[];
+};
+
+
+
+const OptionsGroup = ({ type, title, options }: OptionsGroup) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const { state, dispatch } = useRecordingContext();
 
@@ -57,4 +59,4 @@ const GroupButton = ({ type, title, options }: GroupButtonProps) => {
 	);
 };
 
-export default GroupButton;
+export default OptionsGroup;

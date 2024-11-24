@@ -22,7 +22,7 @@ export default function RootLayout({
 			<body className={inter.className}>
 				<RecordingWrapper>
 					<Navbar />
-					{children}
+					<main className="min-h-screen">{children}</main>
 					<Footer />
 				</RecordingWrapper>
 			</body>
