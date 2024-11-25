@@ -20,29 +20,11 @@ const Dropdown = ({ type, title, options, handleChange }: DropdownProps) => {
 	const { state } = useRecordingContext();
 
 	const handleOptionChange = ({ id, name }: Option) => {
-		console.log(`Option ${name} with id ${id} was clicked`);
+
 
 		handleChange({ id, name });
 		setIsOpen(false);
 	};
-
-	/* const handleOptionChange = ({ id, name }: Option) => {
-		console.log(`Option ${name} with id ${id} was clicked`);
-
-		dispatch({
-			type: 'SET_RECORDING',
-			payload: {
-				config: {
-					...state.config,
-					[type]: {
-						...state.config[type],
-						value: id,
-					},
-				},
-			},
-		});
-		setIsOpen(false);
-	}; */
 
 	return (
 		<details open={true}>

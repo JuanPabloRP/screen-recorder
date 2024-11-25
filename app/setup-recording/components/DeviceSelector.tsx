@@ -66,7 +66,7 @@ export default function DeviceSelector() {
 			});
 
 			// Here you would handle the stream (e.g., pass it to a recording function)
-			console.log('Stream ready:', stream);
+
 		} catch (error) {
 			console.error('Error accessing selected devices:', error);
 			setPermissionError('Error al acceder a los dispositivos seleccionados');

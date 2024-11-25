@@ -3,15 +3,14 @@ import { useRecordingContext } from '@/context/recordingContext';
 import { StaticImport } from 'next/dist/shared/lib/get-img-props';
 import Image from 'next/image';
 
-import { useConfigOptions } from '@/hooks/useRecordingConfig';
-import useRecording from '@/hooks/useRecording';
-import { getDevices } from '@/utils/helpers';
-import GroupButton from '@/app/setup-recording/components/OptionsGroup';
+import { useConfigOptions } from '@/utils/useRecordingConfig';
+
 import OptionsGroup from '@/app/setup-recording/components/OptionsGroup';
 import DeviceSelector from './components/DeviceSelector';
 import { useState } from 'react';
 import { MediaDeviceType } from '@/shared/device-selector.type';
 import Modal from '@/components/Modal';
+import { useRecordingControls, useSetupRecordingControls } from '@/hooks';
 
 interface RecordingOptionType {
 	id: string;
@@ -41,7 +40,10 @@ interface RecordingOptionsPropsType {
 const SetupRecording = () => {
 	const { state, dispatch } = useRecordingContext();
 	const { recordingOptions, fpsOptions, fileTypeOptions } = useConfigOptions();
-	const { startRecording, handleRecordingOptions } = useRecording();
+
+	const { startRecording } = useRecordingControls();
+	const { handleRecordingOptions } = useSetupRecordingControls();
+
 	const [permissionError, setPermissionError] = useState<string>('');
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedDevices, setSelectedDevices] = useState<string[]>([]);
@@ -51,20 +53,41 @@ const SetupRecording = () => {
 			target: { id },
 		} = e;
 
-		console.log(id, isActive);
-		handleRecordingOptions(e, 'recordingOptions');
+		await handleRecordingOptions(e, 'recordingOptions');
 
-		if (id === 'camera' && isActive) {
-			setSelectedDevices((prev) => [...prev, 'camera']);
+		if (id === 'camera') {
+			if (isActive) {
+				setSelectedDevices((prev) => [...prev, 'camera']);
+			} else {
+				setSelectedDevices((prev) =>
+					prev.filter((device) => device !== 'camera')
+				);
+			}
 		}
 
-		if (id === 'microphone' && isActive) {
-			setSelectedDevices((prev) => [...prev, 'mic']);
+		if (id === 'mic') {
+			if (isActive) {
+				setSelectedDevices((prev) => [...prev, 'mic']);
+			} else {
+				setSelectedDevices((prev) => prev.filter((device) => device !== 'mic'));
+			}
 		}
 	};
 
 	const handleStartRecording = async () => {
-		startRecording();
+		if (selectedDevices.length === 0) {
+			return startRecording();
+		}
+
+		setIsModalOpen(true);
+
+		return (
+			<>
+				<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+					<DeviceSelector />
+				</Modal>
+			</>
+		);
 	};
 
 	if (permissionError) {
@@ -127,10 +150,6 @@ const SetupRecording = () => {
 			>
 				Empezar a grabar
 			</button>
-
-			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-				<DeviceSelector />
-			</Modal>
 
 			{/* Opciones de grabación */}
 			{/* Fps options */}

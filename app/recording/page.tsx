@@ -1,7 +1,15 @@
 'use client';
 
 import { useRecordingContext } from '@/context/recordingContext';
-import useRecording from '@/hooks/useRecording';
+import {
+	useRecording,
+	useRecordingControls,
+	useCameraPipMode,
+	useMediaRecorder,
+	useCameraAndMic,
+	useScreenAndAudio,
+} from '@/hooks';
+
 import { RECORDING_STATE } from '@/utils/CONSTANTS';
 import { useEffect, useState } from 'react';
 
@@ -9,22 +17,18 @@ const Recording = () => {
 	const { state } = useRecordingContext();
 	const { recordingState } = state;
 
+	const { screenAndAudioRef } = useScreenAndAudio();
+
+	const { cameraAndMicRef } = useCameraAndMic();
+
+	const { stopRecording, pauseRecording, continueRecording } =
+		useRecordingControls();
+
 	const {
-		stopRecording,
-		endRecording,
-		pauseRecording,
-		continueRecording,
-		downloadRecording,
-		getRecording,
-		screenAndAudioRef,
-		cameraAndMicRef,
-		mediaRecorderRef,
-		recordedChunks,
+		toggleCameraPiP,
 		initializeCameraInPiPMode,
 		exitCameraInPictureInPicture,
-		toggleCameraPiP,
-	} = useRecording();
-
+	} = useCameraPipMode();
 	const [recordingVideo, setRecordingVideo] = useState(null);
 
 	/* Picture in Picture mode */
@@ -51,7 +55,6 @@ const Recording = () => {
 		stopRecording();
 		const recording = getRecording();
 		setRecordingVideo(recording.url);
-		console.log(recording.url);
 	};
 
 	if (

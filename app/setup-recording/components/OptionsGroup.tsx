@@ -21,7 +21,6 @@ const OptionsGroup = ({ type, title, options }: OptionsGroup) => {
 	const { state, dispatch } = useRecordingContext();
 
 	const handleOptionChange = ({ id, name }: Option) => {
-		console.log(`Option ${name} with id ${id} was clicked`);
 
 		dispatch({
 			type: 'SET_RECORDING',

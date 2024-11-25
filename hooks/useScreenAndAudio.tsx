@@ -4,6 +4,7 @@ import { useRecordingContext } from '@/context/recordingContext';
 const useScreenAndAudio = () => {
 	const { state, dispatch } = useRecordingContext();
 	const screenAndAudioRef = useRef<MediaStream>();
+	const screenAndAudioMediaElement = useRef<HTMLMediaElement>();
 
 	/* Crea el media stream y lo retorna */
 	const getScreenAndAudioMedia = useCallback(async () => {
@@ -13,12 +14,15 @@ const useScreenAndAudio = () => {
 					video: state.screen.isActive
 						? {
 								frameRate: { ideal: state.config.frameRate.value },
-								/* width: state.config.resolution.width,
-							height: state.config.resolution.height,
-               */
 						  }
 						: false,
-					audio: state.audio.isActive ? {} : false,
+					audio: state.audio.isActive
+						? {
+								echoCancellation: true,
+								noiseSuppression: true,
+								sampleRate: 44100,
+						  }
+						: false,
 				});
 
 			if (!screenAndAudioMedia) {
@@ -27,14 +31,21 @@ const useScreenAndAudio = () => {
 			}
 
 			screenAndAudioRef.current = screenAndAudioMedia;
-			(screenAndAudioRef.current as any).srcObject = screenAndAudioMedia;
 
-			return screenAndAudioRef.current;
+			if (screenAndAudioMediaElement.current) {
+				screenAndAudioMediaElement.current.srcObject = screenAndAudioMedia;
+			}
+
+			return {
+				screenAndAudioRef: screenAndAudioRef.current,
+				screenAndAudioMediaElement,
+			};
 		} catch (error) {
 			console.log((error as any).message);
 			return null;
 		}
 	}, [state, screenAndAudioRef]);
+
 
 	/* Lo guarda en el context */
 	const setScreenAndAudioStream = useCallback(

@@ -1,13 +1,37 @@
 'use client';
 import { createContext, useContext, useState, useReducer } from 'react';
 import { ACTIONS, RECORDING_STATE } from '@/utils/CONSTANTS';
-/* type RecordingContextType = {
 
+interface RecordingStateType {
+	recordingState: string;
+	screen: {
+		isActive: boolean;
+	};
+	audio: {
+		isActive: boolean;
+	};
+	screenAndAudioStream: any;
+	camera: {
+		isActive: boolean;
+	};
+	mic: {
+		isActive: boolean;
+	};
+	cameraAndMicStream: any;
+	mediaRecorder: any;
+	config: {
+		resolution: any;
+		quality: any;
+		fileType: {
+			value: string;
+		};
+		frameRate: {
+			value: number;
+		};
+	};
 }
-const RecordingContext = createContext<RecordingContextType>(undefined);
-*/
 
-const initialState = {
+const initialState: RecordingStateType = {
 	recordingState: RECORDING_STATE.INACTIVE,
 	screen: {
 		isActive: true,
@@ -38,9 +62,6 @@ const initialState = {
 
 const recordingReducer = (state: any, action: any) => {
 	const { mediaRecorder } = action.payload;
-
-	console.log(action);
-
 	switch (action.type) {
 		// Setters
 		case ACTIONS.SET_RECORDING:
@@ -61,6 +82,7 @@ const recordingReducer = (state: any, action: any) => {
 			return {
 				...state,
 				recordingState: RECORDING_STATE.STOPED,
+				mediaRecorder: {},
 			};
 		case ACTIONS.END_RECORDING:
 			return {
@@ -81,7 +103,7 @@ const recordingReducer = (state: any, action: any) => {
 
 		// Recording options
 		case ACTIONS.SET_SCREEN:
-			return { ...state };
+			return { ...state, screen: action.payload };
 		case ACTIONS.SET_AUDIO:
 			return { ...state, audio: action.payload };
 		case ACTIONS.SET_CAMERA:

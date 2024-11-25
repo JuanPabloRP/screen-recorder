@@ -1,30 +1,23 @@
 'use client';
 
 import { useRecordingContext } from '@/context/recordingContext';
-import useRecording from '@/hooks/useRecording';
 import React, { useEffect, useState } from 'react';
+import {
+	useCameraAndMic,
+	useCameraPipMode,
+	useRecordingControls,
+	useScreenAndAudio,
+} from '@/hooks';
 
 const RecordingPreview = () => {
 	const { state } = useRecordingContext();
-	const { recordingState } = state;
 
-	const {
-		stopRecording,
-		endRecording,
-		pauseRecording,
-		continueRecording,
-		downloadRecording,
-		getRecording,
-		screenAndAudioRef,
-		cameraAndMicRef,
-		mediaRecorderRef,
-		recordedChunks,
-		initializeCameraInPiPMode,
-		exitCameraInPictureInPicture,
-		toggleCameraPiP,
-	} = useRecording();
+	const { cameraAndMicRef } = useCameraAndMic();
+	const { screenAndAudioRef } = useScreenAndAudio();
+	const { initializeCameraInPiPMode } = useCameraPipMode();
 
 	const [recordingVideo, setRecordingVideo] = useState(null);
+	const { endRecording, stopRecording, getRecording } = useRecordingControls();
 
 	/* Picture in Picture mode */
 	useEffect(() => {
@@ -45,13 +38,20 @@ const RecordingPreview = () => {
 		if (cameraAndMicRef.current)
 			cameraAndMicRef.current.srcObject = state.cameraAndMicStream.srcObject;
 	}, [cameraAndMicRef, state.cameraAndMicStream]);
-	/*
+
 	const handleStopAndGetRecording = () => {
 		stopRecording();
 		const recording = getRecording();
 		setRecordingVideo(recording.url);
 	};
-*/
+
+	const handleRecordeAgain = () => {
+		endRecording({ download: false });
+
+		// go to home
+		
+	};
+
 	return (
 		<section>
 			{/* <video
