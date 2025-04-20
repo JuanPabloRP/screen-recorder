@@ -4,6 +4,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { RecordingWrapper } from '@/context/recordingContext';
+import { ToastContainer } from 'react-toastify';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,11 +19,40 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="es">
-			<body className={inter.className}>
+		<html
+			lang="es"
+			style={{
+				scrollBehavior: 'smooth',
+				minHeight: '100vh',
+			}}
+		>
+			<body
+				className={inter.className}
+				style={{
+					minHeight: '100vh',
+					display: 'flex',
+					flexDirection: 'column',
+					justifyContent: 'space-between',
+				}}
+			>
 				<RecordingWrapper>
 					<Navbar />
-					<main className="min-h-screen">{children}</main>
+					<main style={{ minHeight: 'calc(100vh-120px) !important' }}>
+						<ToastContainer
+							position="top-right"
+							autoClose={5000}
+							hideProgressBar={false}
+							newestOnTop={false}
+							closeOnClick
+							rtl={false}
+							pauseOnFocusLoss
+							draggable
+							pauseOnHover
+							theme="dark"
+						/>
+						<ToastContainer />
+						{children}
+					</main>
 					<Footer />
 				</RecordingWrapper>
 			</body>

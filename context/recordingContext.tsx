@@ -4,20 +4,28 @@ import { ACTIONS, RECORDING_STATE } from '@/utils/CONSTANTS';
 
 interface RecordingStateType {
 	recordingState: string;
-	screen: {
-		isActive: boolean;
+	setupOptions: {
+		multimedia: {
+			screen: {
+				isActive: boolean;
+			};
+			audio: {
+				isActive: boolean;
+			};
+			camera: {
+				isActive: boolean;
+			};
+			mic: {
+				isActive: boolean;
+			};
+		};
 	};
-	audio: {
-		isActive: boolean;
+	multimediaSteams: {
+		screen: any;
+		audio: any;
+		camera: any;
+		mic: any;
 	};
-	screenAndAudioStream: any;
-	camera: {
-		isActive: boolean;
-	};
-	mic: {
-		isActive: boolean;
-	};
-	cameraAndMicStream: any;
 	mediaRecorder: any;
 	config: {
 		resolution: any;
@@ -33,20 +41,28 @@ interface RecordingStateType {
 
 const initialState: RecordingStateType = {
 	recordingState: RECORDING_STATE.INACTIVE,
-	screen: {
-		isActive: true,
+	setupOptions: {
+		multimedia: {
+			screen: {
+				isActive: true,
+			},
+			audio: {
+				isActive: true,
+			},
+			camera: {
+				isActive: false,
+			},
+			mic: {
+				isActive: false,
+			},
+		},
 	},
-	audio: {
-		isActive: true,
+	multimediaSteams: {
+		screen: {},
+		audio: {},
+		camera: {},
+		mic: {},
 	},
-	screenAndAudioStream: {},
-	camera: {
-		isActive: false,
-	},
-	mic: {
-		isActive: false,
-	},
-	cameraAndMicStream: {},
 	mediaRecorder: {},
 	config: {
 		resolution: {},
@@ -61,74 +77,87 @@ const initialState: RecordingStateType = {
 };
 
 const recordingReducer = (state: any, action: any) => {
-	const { mediaRecorder } = action.payload;
-	switch (action.type) {
+	const { type, payload } = action;
+	const { id, value } = payload;
+
+	console.log({ type, payload, state });
+
+	const handlers: Record<string, (state: any) => any> = {
 		// Setters
-		case ACTIONS.SET_RECORDING:
-			return { ...state, ...action.payload };
-		case ACTIONS.SET_SCREEN_AND_AUDIO_STREAM:
-			return { ...state, screenAndAudioStream: action.payload };
-		case ACTIONS.SET_CAMERA_AND_MIC_STREAM:
-			return { ...state, cameraAndMicStream: action.payload };
+		[ACTIONS.SET_SCREEN_AND_AUDIO_STREAM]: () => ({
+			...state,
+			screenAndAudioStream: payload,
+		}),
+		[ACTIONS.SET_CAMERA_AND_MIC_STREAM]: () => ({
+			...state,
+			cameraAndMicStream: payload,
+		}),
 
 		// Recording actions
-		case ACTIONS.START_RECORDING:
-			return {
-				...state,
-				recordingState: RECORDING_STATE.RECORDING,
-				mediaRecorder: mediaRecorder,
-			};
-		case ACTIONS.STOP_RECORDING:
-			return {
-				...state,
-				recordingState: RECORDING_STATE.STOPED,
-				mediaRecorder: {},
-			};
-		case ACTIONS.END_RECORDING:
-			return {
-				...state,
-				recordingState: RECORDING_STATE.INACTIVE,
-				mediaRecorder: {},
-			};
-		case ACTIONS.PAUSE_RECORDING:
-			return {
-				...state,
-				recordingState: RECORDING_STATE.PAUSED,
-			};
-		case ACTIONS.CONTINUE_RECORDING:
-			return {
-				...state,
-				recordingState: RECORDING_STATE.RECORDING,
-			};
+		[ACTIONS.SET_RECORDING_STATE]: () => ({
+			...state,
+			recordingState: payload,
+			multimediaSteams: {
+				...state.multimediaSteams,
+				...payload.multimediaSteams,
+			},
+			mediaRecorder: payload.mediaRecorder,
+		}),
+		[ACTIONS.START_RECORDING]: () => ({
+			...state,
+			recordingState: RECORDING_STATE.RECORDING,
+			mediaRecorder: payload.mediaRecorder,
+		}),
+		[ACTIONS.STOP_RECORDING]: () => ({
+			...state,
+			recordingState: RECORDING_STATE.STOPED,
+			mediaRecorder: {},
+		}),
+		[ACTIONS.END_RECORDING]: () => ({
+			...state,
+			recordingState: RECORDING_STATE.INACTIVE,
+			mediaRecorder: {},
+		}),
+		[ACTIONS.PAUSE_RECORDING]: () => ({
+			...state,
+			recordingState: RECORDING_STATE.PAUSED,
+		}),
+		[ACTIONS.CONTINUE_RECORDING]: () => ({
+			...state,
+			recordingState: RECORDING_STATE.RECORDING,
+		}),
 
 		// Recording options
-		case ACTIONS.SET_SCREEN:
-			return { ...state, screen: action.payload };
-		case ACTIONS.SET_AUDIO:
-			return { ...state, audio: action.payload };
-		case ACTIONS.SET_CAMERA:
-			return { ...state, camera: action.payload };
-		case ACTIONS.SET_MIC:
-			return { ...state, mic: action.payload };
+		[ACTIONS.SET_MULTIMEDIA]: () => ({
+			...state,
+			setupOptions: {
+				multimedia: { ...state.setupOptions.multimedia, [id]: value },
+			},
+		}),
 
-		//
-		case ACTIONS.SET_MEDIA_RECORDER:
-			return { ...state, mediaRecorder: action.payload };
-		case ACTIONS.SET_RECORDING_OPTIONS:
-			return { ...state };
-		case ACTIONS.SET_FRAME_RATE:
-			return {
-				...state,
-				config: {
-					...state.config,
-					frameRate: {
-						value: action.payload,
-					},
-				},
-			};
-		default:
-			return state;
-	}
+		// Configurations
+		[ACTIONS.SET_CONFIG]: () => ({
+			...state,
+			config: {
+				...state.config,
+				resolution: { value: payload },
+			},
+		}),
+
+		// Media recorder and configurations
+		[ACTIONS.SET_MEDIA_RECORDER]: () => ({ ...state, mediaRecorder: payload }),
+		[ACTIONS.SET_RECORDING_OPTIONS]: () => state, // No changes, kept for completeness
+		[ACTIONS.SET_FRAME_RATE]: () => ({
+			...state,
+			config: {
+				...state.config,
+				frameRate: { value: payload },
+			},
+		}),
+	};
+
+	// Return the result of the handler if it exists, otherwise the current state
+	return handlers[type] ? handlers[type](state) : state;
 };
 
 const RecordingContext = createContext<any>(undefined);

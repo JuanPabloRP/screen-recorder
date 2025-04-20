@@ -3,14 +3,16 @@ import { useRecordingContext } from '@/context/recordingContext';
 import { StaticImport } from 'next/dist/shared/lib/get-img-props';
 import Image from 'next/image';
 
-import { useConfigOptions } from '@/utils/useRecordingConfig';
-
-import OptionsGroup from '@/app/setup-recording/components/OptionsGroup';
-import DeviceSelector from './components/DeviceSelector';
-import { useState } from 'react';
-import { MediaDeviceType } from '@/shared/device-selector.type';
-import Modal from '@/components/Modal';
 import { useRecordingControls, useSetupRecordingControls } from '@/hooks';
+
+import screen from '@/public/svg/screen.svg';
+import audio from '@/public/svg/audio.svg';
+import video from '@/public/svg/video.svg';
+import mic from '@/public/svg/mic.svg';
+
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import { useEffect, useState } from 'react';
 
 interface RecordingOptionType {
 	id: string;
@@ -39,72 +41,83 @@ interface RecordingOptionsPropsType {
 
 const SetupRecording = () => {
 	const { state, dispatch } = useRecordingContext();
-	const { recordingOptions, fpsOptions, fileTypeOptions } = useConfigOptions();
 
+	const router = useRouter();
 	const { startRecording } = useRecordingControls();
 	const { handleRecordingOptions } = useSetupRecordingControls();
 
-	const [permissionError, setPermissionError] = useState<string>('');
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [selectedDevices, setSelectedDevices] = useState<string[]>([]);
-
-	const handleRecordingOptionsFunc = async (e: any, isActive: boolean) => {
-		const {
-			target: { id },
-		} = e;
-
-		await handleRecordingOptions(e, 'recordingOptions');
-
-		if (id === 'camera') {
-			if (isActive) {
-				setSelectedDevices((prev) => [...prev, 'camera']);
-			} else {
-				setSelectedDevices((prev) =>
-					prev.filter((device) => device !== 'camera')
-				);
-			}
-		}
-
-		if (id === 'mic') {
-			if (isActive) {
-				setSelectedDevices((prev) => [...prev, 'mic']);
-			} else {
-				setSelectedDevices((prev) => prev.filter((device) => device !== 'mic'));
-			}
-		}
-	};
-
 	const handleStartRecording = async () => {
-		if (selectedDevices.length === 0) {
-			return startRecording();
-		}
-
-		setIsModalOpen(true);
-
-		return (
-			<>
-				<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-					<DeviceSelector />
-				</Modal>
-			</>
-		);
+		startRecording();
 	};
 
-	if (permissionError) {
-		return (
-			<section className="w-full max-w-md mx-auto">
-				<header>
-					<h1 className="text-red-500">Error de Permisos</h1>
-				</header>
-				<section>
-					<p>{permissionError}</p>
-				</section>
-			</section>
-		);
-	}
+	const recordingOptions = [
+		{
+			id: 'screen',
+			title: 'Grabar pantalla',
+			isActive: true,
+			svg: screen,
+			text: 'Pantalla',
+		},
+		{
+			id: 'audio',
+			title: 'Grabar audio',
+			isActive: state.setupOptions.multimedia.audio?.isActive,
+			svg: audio,
+			text: 'Audio',
+		},
+		{
+			id: 'camera',
+			title: 'Grabar cámara',
+			isActive: state.setupOptions.multimedia.camera?.isActive,
+			svg: video,
+			text: 'Cámara',
+		},
+		{
+			id: 'mic',
+			title: 'Grabar micrófono',
+			isActive: state.setupOptions.multimedia.mic?.isActive,
+			svg: mic,
+			text: 'Micrófono',
+		},
+	];
+
+	/* const fpsOptions = [
+		{
+			id: 25,
+			name: '25',
+			isActive: state.config?.frameRate?.value === 25,
+			isDisabled: state.isRecording,
+		},
+		{
+			id: 30,
+			name: '30 (Por defecto)',
+			isActive: state.config?.frameRate?.value === 30,
+			isDisabled: state.isRecording,
+		},
+		{
+			id: 60,
+			name: '60',
+			isActive: state.config?.frameRate?.value === 60,
+			isDisabled: state.isRecording,
+		},
+	];
+ */
+
+	/* if (permissionError) {
+		toast.error('🦄 Wow so easy!', {
+			position: 'top-right',
+			autoClose: 5000,
+			hideProgressBar: false,
+			closeOnClick: true,
+			pauseOnHover: true,
+			draggable: true,
+			progress: undefined,
+			theme: 'dark',
+		});
+	} */
 
 	return (
-		<main className="min-h-screen flex flex-col  items-center gap-10 ">
+		<main className="min-h-full flex flex-col  items-center gap-10 ">
 			<section>
 				<h1 className="text-center text-4xl font-bold mb-5">
 					¿Que deseas grabar?
@@ -113,31 +126,33 @@ const SetupRecording = () => {
 				<ul className="flex flex-wrap gap-5">
 					{recordingOptions.map(
 						(
-							{ id, title, isActive, svg, text }: RecordingOptionType,
+							{ id, isActive, svg, text }: RecordingOptionType,
 							index: number
 						) => (
 							<li
 								key={index}
-								className={`flex flex-col gap-3 justify-center items-center w-36 h-36 rounded-md border border-congress-blue-600  ${
+								id={id}
+								className={`flex flex-col gap-3 justify-center items-center w-36 h-36 rounded-md border border-congress-blue-600 ${
 									isActive
-										? 'bg-congress-blue-600  hover:bg-congress-blue-600/80 '
+										? 'bg-congress-blue-600 hover:bg-congress-blue-600/80'
 										: 'hover:border-congress-blue-400 hover:bg-neutral-900'
-								}  relative`}
+								} cursor-pointer z-30`}
+								onClick={(e) => handleRecordingOptions(e)}
 							>
-								<article
-									className="absolute flex flex-col gap-2
-								w-full h-full justify-center items-center
-							"
+								<Image
+									src={svg}
+									alt="svg"
+									className="text-white -z-50"
+									style={{
+										pointerEvents: 'none',
+									}}
+								/>
+								<span
+									className="text-center -z-50"
+									style={{ pointerEvents: 'none' }}
 								>
-									<Image src={svg} alt="svg" className="text-white " />
-									<p className="text-center">{text}</p>
-								</article>
-
-								<button
-									id={id}
-									className="w-full h-full flex justify-center items-center z-100 absolute "
-									onClick={(e) => handleRecordingOptionsFunc(e, isActive)}
-								></button>
+									{text}
+								</span>
 							</li>
 						)
 					)}
@@ -153,13 +168,13 @@ const SetupRecording = () => {
 
 			{/* Opciones de grabación */}
 			{/* Fps options */}
-			<section>
+			{/* <section>
 				<OptionsGroup
 					type="frameRate"
 					title="FPS deseados"
 					options={fpsOptions}
 				/>
-			</section>
+			</section> */}
 		</main>
 	);
 };

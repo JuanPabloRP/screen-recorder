@@ -1,26 +1,37 @@
 import { useRef } from 'react';
 
+type InitializeMediaRecorderProps = {
+	mediaStream: MediaStream;
+	mimeType?: string;
+};
+
 const useMediaRecorder = () => {
-	const mediaRecorderRef = useRef<MediaRecorder>();
-	const recordedChunks = useRef<any>([]);
+	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+	const recordedChunks = useRef<Blob[]>([]);
 
-	const intializeMediaRecorder = async ({ mediaStream }: any) => {
+	const intializeMediaRecorder = async ({
+		mediaStream,
+		mimeType = 'video/webm; codecs=vp9,opus',
+	}: InitializeMediaRecorderProps): Promise<MediaRecorder | null> => {
 		try {
-			const mediaRecorder = new MediaRecorder(mediaStream, {
-				mimeType: 'video/webm; codecs=vp9,opus',
-			});
+			if (!MediaRecorder.isTypeSupported(mimeType)) {
+				throw new Error(`${mimeType} is not supported on this browser.`);
+			}
 
-			(mediaRecorderRef.current as any) = mediaRecorder;
+			const mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
+			mediaRecorderRef.current = mediaRecorder;
 
-			mediaRecorder.ondataavailable = (event: any) => {
+			mediaRecorder.ondataavailable = (event: BlobEvent) => {
 				if (event.data.size > 0) {
 					recordedChunks.current.push(event.data);
 				}
 			};
 
+			console.log('MediaRecorder initialized:', mediaRecorder);
 			return mediaRecorder;
 		} catch (error) {
-			console.log(error);
+			console.error('Error initializing MediaRecorder:', error);
+			return null;
 		}
 	};
 

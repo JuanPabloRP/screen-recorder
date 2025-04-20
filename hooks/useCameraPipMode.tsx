@@ -32,7 +32,7 @@ const useCameraPipMode = () => {
 
 	// Picture in Picture mode
 	const initializeCameraInPiPMode = async () => {
-		if (!state.camera.isActive) {
+		if (!state.setupOptions.multimedia.camera.isActive) {
 			return;
 		}
 

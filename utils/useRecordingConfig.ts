@@ -22,48 +22,27 @@ export const useConfigOptions = () => {
 			{
 				id: 'audio',
 				title: 'Grabar audio',
-				isActive: state.audio?.isActive,
+				isActive: state.setupOptions.multimedia.audio?.isActive,
 				svg: audio,
 				text: 'Audio',
 			},
 			{
 				id: 'camera',
 				title: 'Grabar cámara',
-				isActive: state.camera?.isActive,
+				isActive: state.setupOptions.multimedia.camera?.isActive,
 				svg: video,
 				text: 'Cámara',
 			},
 			{
 				id: 'mic',
 				title: 'Grabar micrófono',
-				isActive: state.mic?.isActive,
+				isActive: state.setupOptions.multimedia.mic?.isActive,
 				svg: mic,
 				text: 'Micrófono',
 			},
 		],
 		[state]
 	);
-
-	const fpsOptions = [
-		{
-			id: 25,
-			name: '25',
-			isActive: state.config?.frameRate.value === 25,
-			isDisabled: state.isRecording,
-		},
-		{
-			id: 30,
-			name: '30 (Por defecto)',
-			isActive: state.config?.frameRate.value === 30,
-			isDisabled: state.isRecording,
-		},
-		{
-			id: 60,
-			name: '60',
-			isActive: state.config?.frameRate.value === 60,
-			isDisabled: state.isRecording,
-		},
-	];
 
 	const resolutionOptions = [
 		{
@@ -118,7 +97,6 @@ export const useConfigOptions = () => {
 
 	return {
 		recordingOptions,
-		fpsOptions,
 		resolutionOptions,
 		qualityOptions,
 		fileTypeOptions,

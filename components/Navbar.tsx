@@ -13,7 +13,8 @@ const Navbar = () => {
 	};
 	return (
 		<nav
-			className={`flex flex-col  justify-center items-center md:flex-row md:justify-between md:items-center  text-congress-blue-50 md:h-auto bg-[#141414] sticky top-0 z-50`}
+			className={`max-w-3xl mx-auto py-2 px-5 lg:py-0 lg:px-7 md:rounded-3xl text-white w-full sticky top-0 md:top-1 z-40 md:flex md:justify-evenly md:content-center backdrop-blur-3xl flex items-center mb-5`}
+			style={{}}
 		>
 			<Link href="/" className="text-2xl p-5">
 				Grabar pantalla

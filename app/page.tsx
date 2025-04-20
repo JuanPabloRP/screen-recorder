@@ -8,7 +8,7 @@ import { ROUTES_CONSTANTS } from '@/utils/routes.contants';
 export default function Home() {
 	return (
 		<>
-			<main className="min-h-screen">
+			<main className="">
 				<header className="flex justify-around items-center flex-wrap gap-11 lg:gap-2">
 					<div className="text-3xl font-bold">
 						<h1 className="text-balance text-congress-blue-50 ">
@@ -21,7 +21,7 @@ export default function Home() {
 							href={
 								ROUTES_CONSTANTS.find(
 									(r: RouteType) => r.key === 'SETUP_RECORDING'
-								)?.path
+								)?.path!
 							}
 							className="mx-auto  text-center text-lg bg-congress-blue-600 p-2 rounded-md hover:bg-congress-blue-700 focus:bg-congress-blue-800 focus:text-congress-blue-100"
 						>

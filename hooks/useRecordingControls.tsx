@@ -1,232 +1,216 @@
 import { useEffect, useRef, useCallback } from 'react';
-import useScreenAndAudio from './useScreenAndAudio';
-import useCameraAndMic from './useCameraAndMic';
+
+// Next
+import { useRouter } from 'next/navigation';
+
+// Context
 import { useRecordingContext } from '@/context/recordingContext';
+
+// Constants
 import { ACTIONS, RECORDING_STATE } from '@/utils/CONSTANTS';
-import useCameraPipMode from './useCameraPipMode';
+
+// Hooks
 import useMediaRecorder from '@/hooks/useMediaRecorder';
+import useMultimedia from './useMultimedia';
+import { get } from 'http';
 
 const useRecordingControls = () => {
 	const { state, dispatch } = useRecordingContext();
+	const router = useRouter();
+
 	const { mediaRecorderRef, intializeMediaRecorder, recordedChunks } =
 		useMediaRecorder();
-	const { getScreenAndAudioMedia, screenAndAudioRef, setScreenAndAudioStream } =
-		useScreenAndAudio();
-	const { getCameraAndMicMedia, cameraAndMicRef, setCameraAndMicStream } =
-		useCameraAndMic();
 
-	const {
-		toggleCameraPiP,
-		initializeCameraInPiPMode,
-		exitCameraInPictureInPicture,
-	} = useCameraPipMode();
+	const { getMultimedia } = useMultimedia();
 
-	/* ---- Lógica ---- */
-	// Initializa el media recorder
+	/* useEffect(() => {
+		if (state.mediaRecorder) mediaRecorderRef.current = state.mediaRecorder;
+		if (state.screenAndAudioStream)
+			screenAndAudioRef.current = state.screenAndAudioStream;
+		if (state.cameraAndMicStream)
+			cameraAndMicRef.current = state.cameraAndMicStream;
+	}, [state]); */
+
+	const handleDataAvailable = useCallback(
+		(event: BlobEvent) => {
+			if (event.data.size > 0) recordedChunks.current.push(event.data);
+		},
+		[recordedChunks]
+	);
+
 	useEffect(() => {
-		mediaRecorderRef.current = state.mediaRecorder;
-		screenAndAudioRef.current = state.screenAndAudioStream;
-		cameraAndMicRef.current = state.cameraAndMicStream;
-	});
+		if (mediaRecorderRef.current) {
+			mediaRecorderRef.current.ondataavailable = handleDataAvailable;
+		}
+	}, [handleDataAvailable]);
 
-	useEffect(() => {
-		(mediaRecorderRef.current as any).ondataavailable = (event: any) => {
-			if (event.data.size > 0) {
-				recordedChunks.current.push(event.data);
-			}
-		};
-	});
-
-	// Inicia la grabación
-	const startRecording = async () => {
+	const startRecording = useCallback(async () => {
 		try {
-			let cameraAndMicMedia;
-			if (state.camera.isActive || state.mic.isActive) {
-				cameraAndMicMedia = await getCameraAndMicMedia();
-			}
+			const activeMediaElements = getActiveMultimedia();
 
-			// Se configura la pantalla y el audio
-			const screenAndAudioMedia = await getScreenAndAudioMedia();
+			activeMediaElements.forEach(async (media) => {
+				const multimedia = await getMultimedia({
+					media: state.setupOptions.multimedia[media],
+					config: state.config,
+					isVideo: media === 'screen' || media === 'camera',
+				});
 
-			// Siempre se graba minimo la pantalla
-			if (!screenAndAudioMedia) {
-				console.log('No se pudo obtener la pantalla y/o el audio');
+				if (!multimedia) {
+					console.error('No se pudo obtener el multimedia:', media);
+					return;
+				}
+
+				dispatch({
+					type: ACTIONS.SET_MULTIMEDIA,
+					payload: {
+						media,
+						multimedia,
+					},
+				});
+			});
+
+			const screenMedia = await getMultimedia({
+				isVideo: true,
+				media: state.setupOptions.multimedia.screenAndAudio,
+				config: {},
+			});
+
+			const audioMeida = await getMultimedia({
+				isVideo: false,
+				media: state.setupOptions.multimedia.screenAndAudio,
+				config: {},
+			});
+
+			if (!screenMedia?.HTMLMediaElement || !audioMeida?.HTMLMediaElement) {
+				console.error('No se pudo obtener la pantalla y/o el audio');
 				return;
 			}
-			// Se guarda la pantalla y/o el audio en el estado
-			setScreenAndAudioStream({ screenAndAudioMedia });
 
-			// Si se eligio la camara o mic se le agrega a la pista de la grabacion de pantalla
-			if (state.camera.isActive || state.mic.isActive) {
-				(cameraAndMicRef.current as any).srcObject
-					.getTracks()
-					.forEach((track: any) => {
-						(screenAndAudioRef.current as any).srcObject?.addTrack(track);
-					});
+			/*setScreenAndAudioStream(screenAndAudioMedia);
 
-				// Se guarda la cámara y/o el micrófono en el estado
-				setCameraAndMicStream({ cameraAndMicMedia });
+			if (cameraAndMicMedia && state.camera.isActive) {
+				cameraAndMicMedia.getTracks().forEach((track) => {
+					screenAndAudioMedia.screenAndAudioRef?.addTrack(track);
+				});
+				setCameraAndMicStream(cameraAndMicMedia);
 			}
 
 			const mediaRecorder = await intializeMediaRecorder({
-				mediaStream: screenAndAudioMedia,
+				mediaStream: screenAndAudioMedia.screenAndAudioRef,
+				
 			});
 
-			if (!mediaRecorderRef.current) {
-				console.log('No se pudo obtener el mediaRecorder');
-				return;
-			}
-
-			(mediaRecorderRef.current as any)?.start();
-
-			const updatedRecording = {
-				recordingState: RECORDING_STATE.RECORDING,
-				mediaRecorder: mediaRecorder,
-			};
-
-			// Se cambia el estado de la grabación
+				
+			mediaRecorder?.start();
+				*/
 			dispatch({
 				type: ACTIONS.START_RECORDING,
-				payload: updatedRecording,
+				payload: {
+					recordingState: RECORDING_STATE.RECORDING,
+					mediaRecorder: {},
+				},
 			});
+
+			console.log(state);
+
+			router.push('/recording');
 		} catch (error) {
-			console.log(error);
+			console.error('Error al iniciar la grabación:', error);
 		}
+	}, [getMultimedia, router, state, dispatch]);
+
+	const getActiveMultimedia = () => {
+		const multimedia = [];
+		if (state.setupOptions.multimedia.screen.isActive)
+			multimedia.push('screen');
+		if (state.setupOptions.multimedia.audio.isActive) multimedia.push('audio');
+		if (state.setupOptions.multimedia.camera.isActive)
+			multimedia.push('camera');
+		if (state.setupOptions.multimedia.mic.isActive) multimedia.push('mic');
+
+		return multimedia;
 	};
 
-	//
-	const pauseRecording = async () => {
-		if (mediaRecorderRef.current) {
-			(mediaRecorderRef.current as any).pause();
-		}
-		const updatedRecording = {
-			...state,
-			recordingState: RECORDING_STATE.PAUSED,
-		};
-
-		dispatch({
-			type: ACTIONS.PAUSE_RECORDING,
-			payload: updatedRecording,
-		});
-	};
-
-	const continueRecording = async () => {
-		if (mediaRecorderRef.current) {
-			(mediaRecorderRef.current as any).resume();
-		}
-		const updatedRecording = {
-			...state,
-			recordingState: RECORDING_STATE.RECORDING,
-		};
-		dispatch({
-			type: ACTIONS.CONTINUE_RECORDING,
-			payload: updatedRecording,
-		});
-	};
-
-	const getRecording = () => {
+	/* 	const stopRecording = useCallback(() => {
 		try {
-			if (!mediaRecorderRef.current) {
-				throw new Error();
-			}
+			console.log(screenAndAudioRef, cameraAndMicRef, mediaRecorderRef);
+			screenAndAudioRef?.current?.getTracks()?.forEach((track) => track.stop());
+			//cameraAndMicRef.current?.getTracks().forEach((track) => track.stop());
 
-			const blob = new Blob(recordedChunks.current, { type: 'video/webm' });
-			const url = URL.createObjectURL(blob);
+			mediaRecorderRef?.current?.stop();
 
-			return {
-				url,
-			};
-		} catch (error: any) {
-			console.log(error.message);
-			return {
-				url: '',
-			};
-		}
-	};
-
-	const downloadRecording = () => {
-		try {
-			const { url } = getRecording();
-			const a = document.createElement('a');
-			document.body.appendChild(a);
-			a.href = url;
-			a.download = 'grabacion.webm';
-			a.click();
-			window.URL.revokeObjectURL(url);
-			recordedChunks.current = [];
-
-			return {
-				url,
-				downloaded: true,
-			};
-		} catch (error) {
-			console.error(error);
-			return {
-				downloaded: false,
-			};
-		}
-	};
-
-	const stopRecording = () => {
-		try {
-			// Parar grabación de pantalla
-			(screenAndAudioRef.current as any).srcObject
-				?.getTracks()
-				?.forEach((track: any) => track?.stop());
-
-			// Para grabación cámara
-			(cameraAndMicRef.current as any).srcObject
-				?.getTracks()
-				?.forEach((track: any) => track?.stop());
-
-			//
-			if (mediaRecorderRef.current) {
-				(mediaRecorderRef.current as any)?.stop();
-			}
-
-			// Si la cámara esta en modo Picture in Picture se sale
 			if (document.pictureInPictureElement) {
 				document.exitPictureInPicture();
 			}
 
-			const updatedRecording = {
-				...state,
-				recordingState: RECORDING_STATE.STOPED,
-			};
-
 			dispatch({
 				type: ACTIONS.STOP_RECORDING,
-				payload: updatedRecording,
+				payload: {
+					...state,
+					recordingState: RECORDING_STATE.STOPED,
+				},
 			});
 		} catch (error) {
-			console.log(error);
+			console.error('Error al detener la grabación:', error);
 		}
-	};
+	}, [screenAndAudioRef, cameraAndMicRef, mediaRecorderRef, dispatch, state]);
 
-	const endRecording = async ({ download }: any) => {
-		if (download) {
-			downloadRecording();
+	const getRecording = useCallback(() => {
+		try {
+			if (!recordedChunks.current.length) {
+				throw new Error('No hay grabaciones disponibles');
+			}
+
+			const blob = new Blob(recordedChunks.current, { type: 'video/webm' });
+			const url = URL.createObjectURL(blob);
+			return { url };
+		} catch (error) {
+			console.error(error);
+			return { url: '' };
 		}
+	}, [recordedChunks]);
 
-		const updatedRecording = {
-			...state,
-			recordingState: RECORDING_STATE.INACTIVE,
-		};
+	const downloadRecording = useCallback(() => {
+		const { url } = getRecording();
+		if (!url) return;
 
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'grabacion.webm';
+		a.click();
+		URL.revokeObjectURL(url);
+		recordedChunks.current = [];
+	}, [getRecording]);
+
+	const pauseRecording = useCallback(() => {
+		mediaRecorderRef.current?.pause();
 		dispatch({
-			type: ACTIONS.END_RECORDING,
-			payload: updatedRecording,
+			type: ACTIONS.PAUSE_RECORDING,
+			payload: { ...state, recordingState: RECORDING_STATE.PAUSED },
 		});
-	};
+	}, [dispatch, state]);
+
+	const continueRecording = useCallback(() => {
+		mediaRecorderRef.current?.resume();
+		dispatch({
+			type: ACTIONS.CONTINUE_RECORDING,
+			payload: { ...state, recordingState: RECORDING_STATE.RECORDING },
+		});
+	}, [dispatch, state]);
+
+	const endRecording = useCallback(
+		({ download }: { download: boolean }) => {
+			if (download) downloadRecording();
+			dispatch({
+				type: ACTIONS.END_RECORDING,
+				payload: { ...state, recordingState: RECORDING_STATE.INACTIVE },
+			});
+		},
+		[downloadRecording, dispatch, state]
+	); */
 
 	return {
 		startRecording,
-		stopRecording,
-		endRecording,
-		pauseRecording,
-		continueRecording,
-		downloadRecording,
-		getRecording,
 	};
 };
 

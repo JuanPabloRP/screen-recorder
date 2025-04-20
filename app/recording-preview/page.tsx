@@ -12,21 +12,21 @@ import {
 const RecordingPreview = () => {
 	const { state } = useRecordingContext();
 
-	const { cameraAndMicRef } = useCameraAndMic();
-	const { screenAndAudioRef } = useScreenAndAudio();
-	const { initializeCameraInPiPMode } = useCameraPipMode();
+	//const { cameraAndMicRef } = useCameraAndMic();
+	//const { screenAndAudioRef } = useScreenAndAudio();
+	//const { initializeCameraInPiPMode } = useCameraPipMode();
 
-	const [recordingVideo, setRecordingVideo] = useState(null);
+
 	const { endRecording, stopRecording, getRecording } = useRecordingControls();
 
 	/* Picture in Picture mode */
-	useEffect(() => {
+/* 	useEffect(() => {
 		(async () => {
 			if (cameraAndMicRef.current && state.camera.isActive) {
 				await initializeCameraInPiPMode();
 			}
 		})();
-	}, []);
+	}, []); */
 
 	useEffect(() => {
 		if (screenAndAudioRef.current)
@@ -34,22 +34,20 @@ const RecordingPreview = () => {
 				state.screenAndAudioStream.srcObject;
 	}, [screenAndAudioRef, state.screenAndAudioStream]);
 
-	useEffect(() => {
+/* 	useEffect(() => {
 		if (cameraAndMicRef.current)
 			cameraAndMicRef.current.srcObject = state.cameraAndMicStream.srcObject;
-	}, [cameraAndMicRef, state.cameraAndMicStream]);
+	}, [cameraAndMicRef, state.cameraAndMicStream]); */
 
 	const handleStopAndGetRecording = () => {
 		stopRecording();
 		const recording = getRecording();
-		setRecordingVideo(recording.url);
+	
 	};
 
 	const handleRecordeAgain = () => {
 		endRecording({ download: false });
-
 		// go to home
-		
 	};
 
 	return (

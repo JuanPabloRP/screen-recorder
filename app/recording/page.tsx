@@ -2,7 +2,6 @@
 
 import { useRecordingContext } from '@/context/recordingContext';
 import {
-	useRecording,
 	useRecordingControls,
 	useCameraPipMode,
 	useMediaRecorder,
@@ -17,44 +16,45 @@ const Recording = () => {
 	const { state } = useRecordingContext();
 	const { recordingState } = state;
 
-	const { screenAndAudioRef } = useScreenAndAudio();
+	const { screenAndAudioRef, screenAndAudioMediaElement } = useScreenAndAudio();
 
-	const { cameraAndMicRef } = useCameraAndMic();
+	//const { cameraAndMicRef } = useCameraAndMic();
 
-	const { stopRecording, pauseRecording, continueRecording } =
+	const { stopRecording, pauseRecording, continueRecording, getRecording } =
 		useRecordingControls();
 
-	const {
+	/* const {
 		toggleCameraPiP,
 		initializeCameraInPiPMode,
 		exitCameraInPictureInPicture,
 	} = useCameraPipMode();
-	const [recordingVideo, setRecordingVideo] = useState(null);
+	const [recordingVideo, setRecordingVideo] = useState(null); */
 
 	/* Picture in Picture mode */
-	useEffect(() => {
+	/* 	useEffect(() => {
 		(async () => {
 			if (cameraAndMicRef.current && state.camera.isActive) {
 				await initializeCameraInPiPMode();
 			}
 		})();
-	}, []);
+	}, []); */
 
 	useEffect(() => {
-		if (screenAndAudioRef.current)
-			screenAndAudioRef.current.srcObject =
+		if (screenAndAudioMediaElement.current)
+			screenAndAudioMediaElement.current.srcObject =
 				state.screenAndAudioStream.srcObject;
 	}, [screenAndAudioRef, state.screenAndAudioStream]);
 
-	useEffect(() => {
+	/* 	useEffect(() => {
 		if (cameraAndMicRef.current)
 			cameraAndMicRef.current.srcObject = state.cameraAndMicStream.srcObject;
-	}, [cameraAndMicRef, state.cameraAndMicStream]);
+	}, [cameraAndMicRef, state.cameraAndMicStream]); */
 
 	const goToRecordingPreview = () => {
 		stopRecording();
 		const recording = getRecording();
-		setRecordingVideo(recording.url);
+		console.log(recording);
+
 	};
 
 	if (
@@ -69,7 +69,7 @@ const Recording = () => {
 	}
 
 	return (
-		<main className="h-screen w-full flex flex-col items-center  ">
+		<main className=" w-full flex flex-col items-center  ">
 			<header>
 				<h1
 					className={`text-4xl font-bold ${
@@ -88,9 +88,9 @@ const Recording = () => {
 			recordingState === RECORDING_STATE.PAUSED ? (
 				<section className=" ">
 					{/* Screen video stream */}
-					{state.screen.isActive ? (
+					{state.setupOptions.multimedia.screen.isActive ? (
 						<video
-							ref={screenAndAudioRef}
+							ref={screenAndAudioMediaElement.current?.srcObject}
 							autoPlay
 							muted
 							className="max-w-3xl bg-neutral-900 opacity-50"
@@ -98,12 +98,12 @@ const Recording = () => {
 					) : null}
 
 					{/* Camera video stream */}
-					{state.camera.isActive ? (
+					{/* {state.setupOptions.multimedia.camera.isActive ? (
 						<section className="max-w-52 bg-neutral-900 absolute right-0 bottom-0 m-5 rounded-md">
 							<video ref={cameraAndMicRef} autoPlay muted></video>
 							<button onClick={() => toggleCameraPiP()}>Cambiar modo</button>
 						</section>
-					) : null}
+					) : null} */}
 
 					{/* Options */}
 					<section className="flex gap-5  ">
@@ -155,7 +155,7 @@ const Recording = () => {
 							)}
 						</section>
 
-						{/* Stop and Download btn */}
+						{/* Stop btn */}
 						<button
 							className='className="mx-auto  text-center text-lg bg-red-500 p-2 rounded-md hover:bg-red-600 focus:bg-red-800 focus:text-congress-blue-100'
 							onClick={goToRecordingPreview}

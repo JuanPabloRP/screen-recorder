@@ -3,20 +3,21 @@ import { useRecordingContext } from '@/context/recordingContext';
 
 const useScreenAndAudio = () => {
 	const { state, dispatch } = useRecordingContext();
-	const screenAndAudioRef = useRef<MediaStream>();
-	const screenAndAudioMediaElement = useRef<HTMLMediaElement>();
+	const screenAndAudioRef = useRef<MediaStream | null>(null);
+	const screenAndAudioMediaElement = useRef<HTMLMediaElement | null>(null);
 
-	/* Crea el media stream y lo retorna */
+	/**
+	 * Crea un MediaStream combinando pantalla y audio
+	 * @returns El MediaStream obtenido o `null` en caso de error
+	 */
 	const getScreenAndAudioMedia = useCallback(async () => {
 		try {
 			const screenAndAudioMedia: MediaStream =
 				await navigator.mediaDevices.getDisplayMedia({
-					video: state.screen.isActive
-						? {
-								frameRate: { ideal: state.config.frameRate.value },
-						  }
+					video: state.setupOptions.multimedia.screen.isActive
+						? { frameRate: { ideal: state.config.frameRate.value } }
 						: false,
-					audio: state.audio.isActive
+					audio: state.setupOptions.multimedia.audio.isActive
 						? {
 								echoCancellation: true,
 								noiseSuppression: true,
@@ -26,40 +27,53 @@ const useScreenAndAudio = () => {
 				});
 
 			if (!screenAndAudioMedia) {
-				console.log('No se pudo obtener el stream de pantalla y audio');
-				return;
+				console.error('No se pudo obtener el stream de pantalla y audio.');
+				return null;
 			}
 
 			screenAndAudioRef.current = screenAndAudioMedia;
 
+			// Asigna el stream al elemento media si existe
 			if (screenAndAudioMediaElement.current) {
 				screenAndAudioMediaElement.current.srcObject = screenAndAudioMedia;
 			}
 
+			console.log('Media obtenido:', { screenAndAudioMedia });
 			return {
 				screenAndAudioRef: screenAndAudioRef.current,
 				screenAndAudioMediaElement,
 			};
 		} catch (error) {
-			console.log((error as any).message);
+			console.error('Error obteniendo media:', (error as Error).message);
 			return null;
 		}
-	}, [state, screenAndAudioRef]);
+	}, [state.setupOptions, state.config.frameRate.value]);
 
-
-	/* Lo guarda en el context */
+	/**
+	 * Guarda el MediaStream en el contexto global
+	 * @param screenAndAudioMedia MediaStream a guardar
+	 */
 	const setScreenAndAudioStream = useCallback(
-		async ({ screenAndAudioMedia }: any) => {
+		(screenAndAudioMedia: MediaStream) => {
+			if (!screenAndAudioMedia) {
+				console.warn('No se proporcionó un MediaStream válido para guardar.');
+				return;
+			}
+
+			console.log('Guardando MediaStream en contexto:', {
+				screenAndAudioMedia,
+			});
 			dispatch({
 				type: 'SET_SCREEN_AND_AUDIO_STREAM',
 				payload: screenAndAudioMedia,
 			});
 		},
-		[]
+		[dispatch]
 	);
 
 	return {
 		screenAndAudioRef,
+		screenAndAudioMediaElement,
 		getScreenAndAudioMedia,
 		setScreenAndAudioStream,
 	};
